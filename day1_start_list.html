@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+
+    <title>Start List - SportOrg</title>
+    
+
+    
+<style>
+    p,
+    blockquote,
+    ul,
+    ol,
+    dl,
+    table,
+    pre {
+        margin-top: 0;
+        margin-bottom: 16px;
+    }
+
+    table.sportorg-table {
+        display: block;
+        width: 100%;
+        overflow: visible;
+        word-break: keep-all;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    table.sportorg-table th {
+        font-weight: bold;
+        border-bottom: 2px solid black;
+        margin-bottom: 5px;
+    }
+
+    table.sportorg-table th,
+    table.sportorg-table td {
+        padding: 3px 13px;
+        text-align: left;
+        /*border: 1px solid #ddd;*/
+    }
+
+    table.sportorg-table tr {
+        background-color: #fff;
+        /*border-top: 1px solid #ccc;*/
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    /*table.sportorg-table tr:nth-child(2n) {*/
+        /*background-color: #f8f8f8;*/
+    /*}*/
+
+    table.empty-table {
+        width: auto;
+    }
+
+    table.empty-table tr {
+        background-color: white;
+        border: 0;
+    }
+
+    table.empty-table td, table.empty-table th {
+        border: 0;
+    }
+
+    hr {
+        box-sizing: content-box;
+        height: 0;
+    }
+
+    hr {
+        height: 0;
+        margin: 15px 0;
+        overflow: hidden;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    hr:before {
+        display: table;
+        content: "";
+    }
+
+    hr:after {
+        display: table;
+        clear: both;
+        content: "";
+    }
+
+    hr {
+        height: 4px;
+        padding: 0;
+        margin: 16px 0;
+        background-color: #e7e7e7;
+        border: 0 none;
+    }
+
+    a:not([href]) {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    a {
+        color: #4078c0;
+        text-decoration: none;
+    }
+
+    a:hover,
+    a:active {
+        text-decoration: underline;
+    }
+
+    a {
+        background-color: transparent;
+    }
+
+    a:active,
+    a:hover {
+        outline: 0;
+    }
+
+    .print-only {
+        display: none;
+    }
+
+    .no-print {
+        display: block;
+    }
+
+    .nowrap {
+        white-space: nowrap;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* SPLITS */
+
+    .table-leg {
+        padding: 0;
+        margin: 0;
+    }
+
+    .table-leg th,
+    .table-leg td {
+        border: 0;
+    }
+
+    .table-leg tr {
+        border-top: 0;
+    }
+
+    .result-1,
+    .result-2,
+    .result-3 {
+        font-weight: bold;
+    }
+
+    .result-1 {
+        /*background: gold;*/
+    }
+
+    .result-2 {
+        /*background: silver;*/
+    }
+
+    .result-3 {
+        /*background: #cd7f32;*/
+    }
+
+    @media print {
+        @page {
+            margin: 0.5cm;
+        }
+
+        body {
+            font-size: 85%;
+        }
+
+        table.sportorg-table {
+            display: table;
+            width: 100%;
+        }
+
+        table.sportorg-table th,
+        table.sportorg-table td {
+            padding: 1px 10px;
+        }
+
+        table.sportorg-table,
+        pre {
+            margin-bottom: 1px;
+        }
+
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1px 0;
+        }
+
+        section, .new-page {
+            page-break-before: always;
+        }
+
+        ul {
+            page-break-inside: avoid;
+        }
+
+        p {
+            widows: 4;
+        }
+
+        a[href^="http"]:after {
+            content: " (" attr(href) ")";
+        }
+
+        abbr[title]:after {
+            content: " (" attr(title) ")";
+        }
+
+        .print-only {
+            display: inline;
+        }
+
+        .no-print {
+            display: none;
+        }
+    }
+</style>
+
+    
+<style>
+    /* SETTINGS */
+    .sportorg-settings {
+        position: fixed;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        background: white;
+        top: 3px;
+        right: 3px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .sportorg-settings-row {
+        margin: 5px;
+    }
+
+    @media print {
+        .sportorg-settings {
+            display: none;
+        }
+    }
+</style>
+<script>
+    var MAX_ORG_NAME = 50;
+    var MAX_PERSON_NAME = 30;
+
+    var TableGenerator = (function () {
+        var Table = function () {
+            return document.createElement('table');
+        };
+        var THead = function () {
+            return document.createElement('thead');
+        };
+        var TBody = function () {
+            return document.createElement('tbody');
+        };
+        var Tr = function () {
+            return document.createElement('tr');
+        };
+        var Th = function () {
+            return document.createElement('th');
+        };
+        var Td = function () {
+            return document.createElement('td');
+        };
+
+        function TableGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableGenerator.prototype.getTable = function (options) {
+            var table = Table();
+            if (options && options.className) table.className = options.className;
+            table.appendChild(this.getHead());
+            table.appendChild(this.getBody());
+            return table;
+        };
+
+        TableGenerator.prototype.getHead = function () {
+            var tr = Tr();
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var th = Th();
+                var title = this.getHeaderName(key);
+                if (title instanceof Node) {
+                    th.appendChild(title);
+                }
+                else {
+                    th.appendChild(document.createTextNode(title));
+                }
+                tr.appendChild(th);
+            }
+            var thead = THead();
+            thead.appendChild(tr);
+            return thead;
+        };
+
+        TableGenerator.prototype.getBody = function () {
+            var tbody = TBody();
+            var cols = this.headers().length;
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                var tr = Tr();
+                if (obj instanceof Node || typeof obj === 'string') {
+                    var td = Td();
+                    td.colSpan = cols;
+                    if (typeof obj === 'string') {
+                        td.appendChild(document.createTextNode(obj));
+                    }
+                    else {
+                        td.appendChild(obj);
+                    }
+                    tr.appendChild(td);
+                }
+                else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var td = Td();
+                        if (obj[key]) {
+                            if (obj[key] instanceof Node) {
+                                td.appendChild(obj[key]);
+                            }
+                            else {
+                                td.appendChild(document.createTextNode(obj[key]));
+                            }
+                        }
+                        tr.appendChild(td);
+                    }
+                }
+                tbody.appendChild(tr);
+            }
+            return tbody;
+        };
+
+        TableGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        return TableGenerator
+    }());
+
+    var TableTextGenerator = (function () {
+
+        function TableTextGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableTextGenerator.prototype.getTable = function (options) {
+            var node = document.createElement('pre');
+            if (options && options.className) node.className = options.className;
+            node.appendChild(this.getHead());
+            node.appendChild(this.getBody());
+            return node;
+        };
+
+        TableTextGenerator.prototype.getSliceText = function (text, size) {
+            if (text === undefined) {
+                text = '';
+            }
+            text = String(text);
+            if (size) {
+                text = text.slice(0, size);
+                if (text.length < size + 1) {
+                    var arr = [];
+                    for (var i = 0; i < size + 1 - text.length; i++) {
+                        arr.push(' ');
+                    }
+                    text += arr.join('');
+                }
+            } else {
+                text += '\t';
+            }
+            return text;
+        };
+
+        TableTextGenerator.prototype.getHead = function () {
+            var text = '';
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var h = this.getHeaderObj(key);
+                var title = h && h.title;
+                var size = h && h.size;
+                if (size) {
+                    text += this.getSliceText(title, size);
+                } else {
+                    text += title;
+                }
+            }
+            text += '\n';
+            var blockU = document.createElement('u');
+            var blockB = document.createElement('b');
+            blockB.appendChild(document.createTextNode(text));
+            blockU.appendChild(blockB);
+            return blockU;
+        };
+
+        TableTextGenerator.prototype.getBody = function () {
+            var text = '';
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                if (typeof obj === 'string') {
+                    text += obj;
+                } else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var h = this.getHeaderObj(key);
+                        var size = h && h.size;
+                        if (size) {
+                            text += this.getSliceText(obj[key], size);
+                        } else {
+                            text += obj[key];
+                        }
+                    }
+                }
+                text += '\n';
+            }
+            return document.createTextNode(text);
+        };
+
+        TableTextGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableTextGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        TableTextGenerator.prototype.getHeaderObj = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field;
+                    }
+                }
+            }
+        };
+
+        return TableTextGenerator
+    }());
+
+    var SettingsGenerator = (function () {
+        var Block = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings';
+            return el
+        };
+        var Row = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings-row';
+            return el
+        };
+
+        function SettingsGenerator(settings) {
+            this.settings = settings;
+            this.isShow = true;
+        }
+
+        SettingsGenerator.prototype.show = function () {
+            var block = Block();
+            this.el = block;
+            for (var _i = 0, _a = this.settings; _i < _a.length; _i++) {
+                var setting = _a[_i];
+                var row = Row();
+                row.className = row.className + ' ' + 'sportorg-settings-hidden';
+                row.appendChild(this.getElBySetting(setting));
+                block.appendChild(row);
+            }
+            var btn = Row();
+            btn.appendChild(this.getHiddenButton());
+            block.appendChild(btn);
+            document.body.appendChild(block);
+            this.toggleHidden();
+        };
+        SettingsGenerator.prototype.getElBySetting = function (setting) {
+            if (typeof setting.value === 'boolean') {
+                var i = document.createElement('input');
+                i.type = 'checkbox';
+                if (setting.value) {
+                    i.checked = true;
+                }
+                if (setting.change) {
+                    i.onchange = function () {
+                        if (i.checked !== setting.value) {
+                            setting.change(i.checked);
+                            setting.value = i.checked;
+                        }
+                    }
+                }
+                var label = document.createElement('label');
+                label.appendChild(i);
+                label.appendChild(document.createTextNode(setting.title));
+                return label
+            } else if (setting.value instanceof Array) {
+                var s = document.createElement('select');
+                for (var _i = 0, _a = setting.value; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    s.appendChild(new Option(obj.text, obj.value));
+                }
+                if (setting.change) {
+                    s.onchange = function () {
+                        var results = [];
+                        for (var _i = 0, _a = s.selectedOptions; _i < _a.length; _i++) {
+                            var item = _a[_i];
+                            results.push(item.value);
+                        }
+                        setting.change(results);
+                    };
+                }
+                var label = document.createElement('label');
+                label.appendChild(document.createTextNode(setting.title));
+                label.appendChild(s);
+                return label
+            }
+        };
+        SettingsGenerator.prototype.toggleHidden = function () {
+            var els = document.getElementsByClassName('sportorg-settings-hidden');
+            for (var _i = 0, els_ = els; _i < els_.length; _i++) {
+                var el = els_[_i];
+                if (this.isShow) {
+                    el.style.display = 'none';
+                    if (this.el) {
+                        this.el.style.opacity = '.3';
+                    }
+                }
+                else {
+                    el.style.display = 'block';
+                    if (this.el) {
+                        this.el.style.opacity = '1';
+                    }
+                }
+            }
+            this.isShow = !this.isShow;
+        };
+        SettingsGenerator.prototype.getHiddenButton = function () {
+            var el = document.createElement('button');
+            el.appendChild(document.createTextNode('SETTINGS'));
+            var _this = this;
+            el.onclick = function (ev) { _this.toggleHidden() };
+            return el;
+        };
+        return SettingsGenerator;
+    }());
+
+    function toHHMMSS(value) {
+        if (value === 0) {
+            return '00:00:00'
+        }
+        if (!value) return '';
+        value /= 1000;
+        var hours = Math.floor(value / 3600);
+        value %= 3600;
+        var minutes = Math.floor(value / 60);
+        var seconds = ~~(value % 60);
+
+        var date = new Date(2000, 0, 1, hours, minutes, seconds);
+
+        var with0 = function (dd) {
+            return (dd < 10 ? '0' + dd : dd) + '';
+        };
+
+        return with0(date.getHours()) + ':' + with0(date.getMinutes()) + ':' + with0(date.getSeconds());
+    }
+
+    function getById(list, id) {
+        if (id) {
+            for (var _i = 0, list_ = list; _i < list_.length; _i++) {
+                var obj = list_[_i];
+                if (obj.id === id) {
+                    return obj;
+                }
+            }
+        }
+        return null;
+    }
+
+    function racePreparation(race) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var obj = _a[_i];
+            obj.organization = getById(race.organizations, obj.organization_id);
+            obj.group = getById(race.groups, obj.group_id);
+        }
+        for (var _b = 0, _c = race.results; _b < _c.length; _b++) {
+            var obj = _c[_b];
+            obj.status = obj.status === 16 ? 1 : obj.status;
+            obj.person = getById(race.persons, obj.person_id);
+        }
+        for (var _d = 0, _e = race.groups; _d < _e.length; _d++) {
+            var obj = _e[_d];
+            obj.course = getById(race.courses, obj.course_id);
+        }
+        for (var _f = 0, _g = ['groups', 'courses', 'organizations']; _f < _g.length; _f++) {
+            var itemName = _g[_f];
+            race[itemName].sort(function (a, b) {
+                if (a.name.toUpperCase() < b.name.toUpperCase())
+                    return -1;
+                if (a.name.toUpperCase() > b.name.toUpperCase())
+                    return 1;
+                return 0;
+            });
+        }
+        return race;
+    }
+
+    function getGroupsBlockElement(race) {
+        var groupBlock = document.createElement('div');
+        groupBlock.className = 'no-print';
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
+            var a = document.createElement('a');
+            a.href = '#' + group.name;
+            a.appendChild(document.createTextNode(group.name + ' '));
+            groupBlock.appendChild(a);
+        }
+        return groupBlock;
+    }
+
+    function dateFormat(date) {
+        date = date ? new Date(date) : new Date();
+		return date.getDate().toString().padStart(2,'0')  + '.' + (date.getMonth() + 1).toString().padStart(2,'0') + '.' + date.getFullYear();
+    }
+
+    var Qualification = {
+        '': 'б/р',
+        0: 'б/р',
+        3: 'IIIю',
+        2: 'IIю',
+        1: 'Iю',
+        6: 'III',
+        5: 'II',
+        4: 'I',
+        7: 'КМС',
+        8: 'МС',
+        9: 'МСМК'
+    };
+
+    var STATUS_PRIORITY = [8, 4, 3, 5, 13];
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+</script>
+
+</head>
+<body>
+<div id="content">
+<div class="text-center">
+    <h3> <br>
+    14.12.2024 г.Нови-сад , Лиманский парк</h3>
+    <h2>START LIST</h2>
+</div>
+<div id="start-list-tables"></div>
+
+<script>
+    var race = {"courses": [{"bib": 0, "climb": 0, "controls": [{"code": "46", "length": 0, "object": "CourseControl"}, {"code": "48", "length": 0, "object": "CourseControl"}, {"code": "47", "length": 0, "object": "CourseControl"}, {"code": "51", "length": 0, "object": "CourseControl"}, {"code": "54", "length": 0, "object": "CourseControl"}, {"code": "53", "length": 0, "object": "CourseControl"}, {"code": "55", "length": 0, "object": "CourseControl"}, {"code": "50", "length": 0, "object": "CourseControl"}, {"code": "43", "length": 0, "object": "CourseControl"}, {"code": "42", "length": 0, "object": "CourseControl"}, {"code": "45", "length": 0, "object": "CourseControl"}, {"code": "44", "length": 0, "object": "CourseControl"}, {"code": "48", "length": 0, "object": "CourseControl"}, {"code": "51", "length": 0, "object": "CourseControl"}, {"code": "52", "length": 0, "object": "CourseControl"}, {"code": "49", "length": 0, "object": "CourseControl"}, {"code": "51", "length": 0, "object": "CourseControl"}, {"code": "41", "length": 0, "object": "CourseControl"}, {"code": "31", "length": 0, "object": "CourseControl"}, {"code": "34", "length": 0, "object": "CourseControl"}, {"code": "35", "length": 0, "object": "CourseControl"}, {"code": "38", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "37", "length": 0, "object": "CourseControl"}, {"code": "36", "length": 0, "object": "CourseControl"}, {"code": "33", "length": 0, "object": "CourseControl"}, {"code": "32", "length": 0, "object": "CourseControl"}, {"code": "31", "length": 0, "object": "CourseControl"}, {"code": "35", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "d3d98d61-d364-4717-ac1e-53ec330fc84e", "length": 4900, "name": "D1", "object": "Course"}, {"bib": 0, "climb": 0, "controls": [{"code": "41", "length": 0, "object": "CourseControl"}, {"code": "54", "length": 0, "object": "CourseControl"}, {"code": "53", "length": 0, "object": "CourseControl"}, {"code": "40", "length": 0, "object": "CourseControl"}, {"code": "55", "length": 0, "object": "CourseControl"}, {"code": "50", "length": 0, "object": "CourseControl"}, {"code": "52", "length": 0, "object": "CourseControl"}, {"code": "51", "length": 0, "object": "CourseControl"}, {"code": "49", "length": 0, "object": "CourseControl"}, {"code": "52", "length": 0, "object": "CourseControl"}, {"code": "47", "length": 0, "object": "CourseControl"}, {"code": "48", "length": 0, "object": "CourseControl"}, {"code": "46", "length": 0, "object": "CourseControl"}, {"code": "45", "length": 0, "object": "CourseControl"}, {"code": "44", "length": 0, "object": "CourseControl"}, {"code": "43", "length": 0, "object": "CourseControl"}, {"code": "42", "length": 0, "object": "CourseControl"}, {"code": "45", "length": 0, "object": "CourseControl"}, {"code": "31", "length": 0, "object": "CourseControl"}, {"code": "32", "length": 0, "object": "CourseControl"}, {"code": "33", "length": 0, "object": "CourseControl"}, {"code": "35", "length": 0, "object": "CourseControl"}, {"code": "34", "length": 0, "object": "CourseControl"}, {"code": "31", "length": 0, "object": "CourseControl"}, {"code": "36", "length": 0, "object": "CourseControl"}, {"code": "37", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "38", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "a6c61978-687d-4119-8b59-b7ecc9761c70", "length": 3700, "name": "D2", "object": "Course"}, {"bib": 0, "climb": 0, "controls": [{"code": "53", "length": 0, "object": "CourseControl"}, {"code": "54", "length": 0, "object": "CourseControl"}, {"code": "55", "length": 0, "object": "CourseControl"}, {"code": "40", "length": 0, "object": "CourseControl"}, {"code": "31", "length": 0, "object": "CourseControl"}, {"code": "32", "length": 0, "object": "CourseControl"}, {"code": "35", "length": 0, "object": "CourseControl"}, {"code": "34", "length": 0, "object": "CourseControl"}, {"code": "33", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "37", "length": 0, "object": "CourseControl"}, {"code": "36", "length": 0, "object": "CourseControl"}, {"code": "38", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "6e059db1-7145-4c36-b736-5bc0bb575955", "length": 2400, "name": "D3", "object": "Course"}, {"bib": 0, "climb": 0, "controls": [{"code": "31", "length": 0, "object": "CourseControl"}, {"code": "33", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "36", "length": 0, "object": "CourseControl"}, {"code": "37", "length": 0, "object": "CourseControl"}, {"code": "35", "length": 0, "object": "CourseControl"}, {"code": "34", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "15ccb53c-e0ea-4370-8a76-0322f06ce0dd", "length": 1400, "name": "D4", "object": "Course"}], "data": {"chief_referee": "", "description": "", "end_datetime": "2024-12-14 12:30:00", "location": "г.Нови-сад , Лиманский парк", "race_type": 0, "relay_leg_count": 3, "secretary": "", "start_datetime": "2024-12-14 11:00:00", "title": "", "url": ""}, "groups": [{"__type": null, "count_finished": 0, "count_person": 12, "course_id": "d3d98d61-d364-4717-ac1e-53ec330fc84e", "first_number": 0, "id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 1924, "min_age": 0, "min_year": 2024, "name": "D1", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}, {"__type": null, "count_finished": 0, "count_person": 7, "course_id": "a6c61978-687d-4119-8b59-b7ecc9761c70", "first_number": 0, "id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 1924, "min_age": 0, "min_year": 2024, "name": "D2", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}, {"__type": null, "count_finished": 0, "count_person": 12, "course_id": "6e059db1-7145-4c36-b736-5bc0bb575955", "first_number": 0, "id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 1924, "min_age": 0, "min_year": 2024, "name": "D3", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}, {"__type": null, "count_finished": 1, "count_person": 1, "course_id": "15ccb53c-e0ea-4370-8a76-0322f06ce0dd", "first_number": 0, "id": "22e3bd2e-ced5-4a95-a0ee-fac9f458ca04", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 1924, "min_age": 0, "min_year": 2024, "name": "D4", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}], "id": "607f959f-aeb6-422c-bb6d-7c172c189597", "object": "Race", "organizations": [{"code": "", "contact": "", "count_person": 0, "country": "", "id": "067d476b-5a1c-4df3-a780-ec57a38b233d", "name": "D1", "object": "Organization", "region": "", "sex": 0}, {"code": "", "contact": "", "count_person": 18, "country": "", "id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "name": "", "object": "Organization", "region": "", "sex": 0}, {"code": "", "contact": "", "count_person": 14, "country": "", "id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "name": "Лично", "object": "Organization", "region": "", "sex": 0}], "persons": [{"bib": 0, "birth_date": "2014-01-01", "card_number": 1312960, "comment": "", "group_id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "id": "efcc67ce-f01d-4550-a835-1da8e1c15017", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Ксения", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 2, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Нестерова ", "world_code": "", "year": 2014}, {"bib": 0, "birth_date": "2012-01-01", "card_number": 2070987, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "aef1ca00-c5c5-4ee4-86e1-5005cc9b425d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Александра", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Разумная", "world_code": "", "year": 2012}, {"bib": 0, "birth_date": null, "card_number": 8505224, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "3982b5df-7b8b-40a1-9dcc-55614df5aefe", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Татьяна", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Разумная", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8090031, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "f09e98d9-693e-4449-b29a-851ae11d820f", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Александар", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Петрович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8090037, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "8c11e5ca-2e34-482e-9674-203e2e88ca9d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Давид", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Петрович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8500698, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "3e4fdac1-5be0-4118-8a2a-900c2fc366a6", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Райна", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Петрович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 1428804, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "915e6284-25f6-441f-b2da-405d87179afe", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Юлия", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 4, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Лукашина", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8500691, "comment": "", "group_id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "id": "f935ba10-f9b7-46c7-83d9-8451ad28a358", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Урош", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Мишич", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2070981, "comment": "", "group_id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "id": "bc114b3d-c574-49ec-9e73-cbfbc3638240", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Давор", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Мишич", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8040382, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "bf2f2143-419b-4aec-8599-4c3534783845", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Василий", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Амбросимов", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8870100, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "514ea05b-0e91-4dfb-b483-7a332af83f70", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Игорь", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Сазонов", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "id": "2dfd65a7-0b53-4221-9dca-c8c8caf65a73", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Игорь", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Cазонов", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "b8126dd9-2f7b-4a12-9157-00f53496e2c5", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Николай", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Минкевич", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "c17c904a-1473-4d5a-870e-0b5d38eae886", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Анастасия", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Васенова", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8500693, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "9c6fde0a-04c7-45b6-a0cb-4362806ff186", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Ясна", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Старович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2095317, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "b4156efa-f749-4d51-932d-ffc9b9ff7c6b", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Борис", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Старович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 1413324, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "4064b532-2c50-42b1-8184-83e8a86f9cbd", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Соня", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Старович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8110332, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "150f4189-6942-4221-9b26-9d2659347793", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Драгиш", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Вит", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8680263, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "1311cbef-2758-44f7-8492-61ac4c988f66", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Георгий", "national_code": "0", "object": "Person", "organization_id": "1b1ae56a-045b-4c9e-b88e-e114d442960f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8630815, "comment": "", "group_id": "9c8384d4-a356-423f-a3fc-1d3a7017f9d3", "id": "f199983e-da35-4c57-876b-8a2933a48da4", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Сергей", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Доронин", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2070510, "comment": "", "group_id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "id": "e22bcf49-3e84-4954-8834-6264ef9ae63f", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Степан", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2070511, "comment": "", "group_id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "id": "31fbfd41-fdec-47ab-90ed-67da732a0525", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Серафим", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 777784, "comment": "", "group_id": "2efb62a1-1714-48ae-ace5-8c7cb56e1094", "id": "1f9a18ef-98c6-4e97-8dfb-f6feeaf40478", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Софья", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Тимошевская", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8628696, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "46808f39-2da7-47bb-821c-af64fa5989b2", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Доронин", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Андрей ", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "e44384a1-ddde-495b-9284-daf7390ad763", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Егор", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Молчанов", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "97f21a40-0b5f-4252-ac6e-ebf4b6ce0566", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Давид", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Паскаль", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "a57fb3e8-00c7-401b-bcaf-9ed5864f077d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Илья", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Чесноков", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "e0bb8710-d683-4616-9f3f-c3f421201320", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Егор", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Мельников", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "1199431f-ea0e-4715-b1c2-dcb5f734f98a", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Ксения", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Вергилич", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "03c36a79-2084-4233-8f2a-d259d3180e97", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Лукьян", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "9e910c9b-e329-4c69-a1a4-aa7fb5224a92", "id": "2120030e-5545-4ab5-a4a8-09780a281d15", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Виктор", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Самойлов", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8505225, "comment": "", "group_id": "22e3bd2e-ced5-4a95-a0ee-fac9f458ca04", "id": "ae1b423e-2ec0-4876-bed4-82f55abf3774", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "анна", "national_code": "0", "object": "Person", "organization_id": "ced7ee88-9a62-4cae-8987-ea16f05f4619", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "нестерова", "world_code": "", "year": 0}], "results": [{"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022279, "created_at": 1734124438.0810688, "credit_time": null, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": null, "finish_msec": 80009007, "finish_time": 80009007, "id": "3dbfd631-7046-49ff-a295-b2dc1451c36d", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": null, "place": 0, "result": "", "result_current": "00:00:16", "result_current_msec": 16000, "result_msec": 16000, "result_relay": "", "result_relay_msec": 80009000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "", "splits": [{"code": "31", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 79995000}, {"code": "33", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 79996000}, {"code": "100", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 79998000}, {"code": "39", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 80000000}, {"code": "36", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 80002000}, {"code": "37", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 80004000}, {"code": "35", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 80006000}, {"code": "34", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 80008000}], "start_msec": 79993003, "start_time": 79993003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8505225, "created_at": 1734124365.9317806, "credit_time": null, "days": 0, "diff": 0, "diff_scores": 0, "final_result_time": null, "finish_msec": 79851007, "finish_time": 79851007, "id": "b73282f7-283a-4b6b-833c-5ad04750181e", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "ae1b423e-2ec0-4876-bed4-82f55abf3774", "place": 1, "result": "00:00:34", "result_current": "00:00:34", "result_current_msec": 34000, "result_msec": 34000, "result_relay": "22:10:51", "result_relay_msec": 79851000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "00:24/km", "splits": [{"code": "31", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 1, "leg_time": 2997, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 2997, "speed": "", "time": 79820000}, {"code": "33", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 1, "leg_time": 3000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 5997, "speed": "", "time": 79823000}, {"code": "100", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 1, "leg_time": 3000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 8997, "speed": "", "time": 79826000}, {"code": "39", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 1, "leg_time": 3000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 11997, "speed": "", "time": 79829000}, {"code": "39", "course_index": 0, "days": 0, "index": 4, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 16997, "speed": "", "time": 79834000}, {"code": "36", "course_index": 5, "days": 0, "index": 5, "is_correct": true, "leg_place": 1, "leg_time": 9000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 20997, "speed": "", "time": 79838000}, {"code": "37", "course_index": 6, "days": 0, "index": 6, "is_correct": true, "leg_place": 1, "leg_time": 3000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 23997, "speed": "", "time": 79841000}, {"code": "35", "course_index": 7, "days": 0, "index": 7, "is_correct": true, "leg_place": 1, "leg_time": 4000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 27997, "speed": "", "time": 79845000}, {"code": "34", "course_index": 8, "days": 0, "index": 8, "is_correct": true, "leg_place": 1, "leg_time": 3000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 30997, "speed": "", "time": 79848000}], "start_msec": 79817003, "start_time": 79817003, "status": 1, "status_comment": "", "system_type": 2}], "settings": {"ignore_punches_before_start": false, "is_corridor_minute_number": false, "is_corridor_order_number": false, "is_fixed_number_interval": true, "is_fixed_start_interval": true, "is_mix_groups": false, "is_split_regions": false, "is_split_start_groups": false, "is_split_teams": false, "is_start_preparation_draw": false, "is_start_preparation_numbers": false, "is_start_preparation_reserve": false, "is_start_preparation_time": false, "live_enabled": false, "marked_route_dont_dsq": false, "marked_route_if_counting_lap": false, "marked_route_if_station_check": false, "marked_route_max_penalty_by_cp": false, "marked_route_mode": "off", "marked_route_penalty_lap_station_code": 80, "marked_route_penalty_time": 60000, "numbers_first": 1, "numbers_interval": 1, "readout_duplicate_timeout": 15000, "reserve_count": 1, "reserve_percent": 0, "reserve_prefix": "_Резерв", "result_processing_fixed_score_value": 1, "result_processing_mode": "time", "result_processing_score_mode": "rogain", "result_processing_scores_allow_duplicates": false, "result_processing_scores_max_overrun_time": 1800000, "result_processing_scores_minute_penalty": 1, "scores_array": "40,37,35,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1", "scores_formula": "200 - 100 * time / leader", "scores_mode": "off", "start_first_time": 60000, "start_interval": 60000, "start_one_minute_qty": 1, "system_assign_chip_reading": "only_unknown_members", "system_assignment_mode": false, "system_duplicate_chip_processing": "several_results", "system_finish_cp_number": 90, "system_finish_source": "station", "system_missed_finish": "zero", "system_port": "COM7", "system_start_cp_number": 31, "system_start_source": "station", "system_zero_time": [11, 0, 0], "time_accuracy": 0, "time_format_24": "less24", "time_rounding": "down"}};
+    racePreparation(race);
+
+    function getStartListByGroup(group) {
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
+            if (person.group && person.group.id === group.id) {
+                results.push({
+                    index: 0,
+                    name: person.surname + ' ' + person.name,
+                    org: (person.organization && String(person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[person.qual],
+                    bib: person.bib,
+                    card_number: person.card_number,
+                    year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
+                    start: toHHMMSS(person.start_time),
+                    start_time: person.start_time,
+					comment: person.comment
+                });
+            }
+        }
+        results.sort(function (a, b) {
+            if (isRelay && a.start_time === b.start_time) {
+                if (a.bib % 1000 === b.bib % 1000) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                } else {
+                    return a.bib % 1000 - b.bib % 1000
+                }
+            }
+            if (a.start_time === b.start_time) {
+                return a.bib - b.bib;
+            }
+            return a.start_time - b.start_time
+        });
+        var index = 0;
+        results.forEach(function (elem) {
+            index++;
+            elem.index = index
+        });
+        if (isRelay) {
+            index = 0;
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000;
+                }
+                results.push(r);
+            }
+        }
+        return results;
+    }
+
+    var Fields = {
+        fields: [
+            {key: 'index', title: '№', size: 4},
+            {key: 'name', title: 'Name', size: 30},
+            {key: 'org', title: 'Fed', size: 20},
+            {key: 'year', title: 'Year', size: 5},
+            {key: 'bib', title: 'Bib', size: 6},
+            {key: 'card_number', title: 'Card1', size: 11},
+			{key: 'comment', title: 'Card2', size: 11},
+            {key: 'start', title: 'Start', size: 13}
+        ],
+        active: function (key, val) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    obj.active = val;
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    }
+                    else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        init: function () {
+            return this;
+        }
+    }.init();
+
+    var store = {};
+
+    function render() {
+        var resultBlock = document.getElementById('start-list-tables');
+        resultBlock.innerHTML = '';
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
+            var titleBlock = document.createElement('h2');
+            titleBlock.id = group.name;
+            titleBlock.appendChild(document.createTextNode(group.name));
+            resultBlock.appendChild(titleBlock);
+            resultBlock.appendChild(getGroupsBlockElement(race));
+            if (store.tableView) {
+                resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+            } else {
+                resultBlock.appendChild(new TableTextGenerator(getStartListByGroup(group), Fields.fields).getTable());
+            }
+        }
+    }
+    render();
+
+    var Scrolling = {
+        direction: 1,
+        enabled: false,
+        lock: false,
+        prev: 0,
+        intervalTimer: 0,
+        init: function () {
+            var _this = this;
+            if (_this.intervalTimer) {
+                clearInterval(_this.intervalTimer)
+            }
+            _this.intervalTimer = setInterval(function () {
+                _this.lock = !_this.lock;
+            }, 5000);
+            window.onscroll = function () {
+                var d = document.documentElement;
+                var offset = d.scrollTop + window.innerHeight;
+                var height = d.offsetHeight;
+
+                if (offset === height) {
+                    _this.direction = -1;
+                }
+                if (offset <= window.innerHeight) {
+                    _this.direction = 1;
+                }
+            };
+            this.pageScroll();
+            return this;
+        },
+        pageScroll: function () {
+            var _this = this;
+            if (_this.enabled && ! _this.lock) {
+                window.scrollBy(10, _this.direction);
+            }
+            setTimeout(function () {
+                _this.pageScroll();
+            }, 10);
+        }
+    }.init();
+
+    new SettingsGenerator([
+        {
+            title: 'Table view',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
+        {
+            title: 'Bib',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Card number',
+            value: Fields.isActive('card_number'),
+            change: function (checked) {
+                Fields.active('card_number', checked);
+                render()
+            }
+        },
+        {
+            title: 'Autoscroll',
+            value: Scrolling.enabled,
+            change: function (checked) {
+                Scrolling.enabled = checked;
+            }
+        },
+    ]).show();
+</script>
+
+</div>
+<div id="footer">
+    
+    <a href="https://sportorg.readthedocs.io">ПО SportOrg v1.7.1</a>
+    <script type="text/javascript">
+        var l = new Date();
+        document.write ('<span class="print-only">Время печати: ' + l.toLocaleString() + '</span>');
+    </script>
+    
+</div>
+</body>
+</html>
