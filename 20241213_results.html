@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+    <title>Results - SportOrg</title>
+    
+    
+<style>
+    p,
+    blockquote,
+    ul,
+    ol,
+    dl,
+    table,
+    pre {
+        margin-top: 0;
+        margin-bottom: 16px;
+    }
+
+    table.sportorg-table {
+        display: block;
+        width: 100%;
+        overflow: visible;
+        word-break: keep-all;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    table.sportorg-table th {
+        font-weight: bold;
+        border-bottom: 2px solid black;
+        margin-bottom: 5px;
+    }
+
+    table.sportorg-table th,
+    table.sportorg-table td {
+        padding: 3px 13px;
+        text-align: left;
+        /*border: 1px solid #ddd;*/
+    }
+
+    table.sportorg-table tr {
+        background-color: #fff;
+        /*border-top: 1px solid #ccc;*/
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    /*table.sportorg-table tr:nth-child(2n) {*/
+        /*background-color: #f8f8f8;*/
+    /*}*/
+
+    table.empty-table {
+        width: auto;
+    }
+
+    table.empty-table tr {
+        background-color: white;
+        border: 0;
+    }
+
+    table.empty-table td, table.empty-table th {
+        border: 0;
+    }
+
+    hr {
+        box-sizing: content-box;
+        height: 0;
+    }
+
+    hr {
+        height: 0;
+        margin: 15px 0;
+        overflow: hidden;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    hr:before {
+        display: table;
+        content: "";
+    }
+
+    hr:after {
+        display: table;
+        clear: both;
+        content: "";
+    }
+
+    hr {
+        height: 4px;
+        padding: 0;
+        margin: 16px 0;
+        background-color: #e7e7e7;
+        border: 0 none;
+    }
+
+    a:not([href]) {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    a {
+        color: #4078c0;
+        text-decoration: none;
+    }
+
+    a:hover,
+    a:active {
+        text-decoration: underline;
+    }
+
+    a {
+        background-color: transparent;
+    }
+
+    a:active,
+    a:hover {
+        outline: 0;
+    }
+
+    .print-only {
+        display: none;
+    }
+
+    .no-print {
+        display: block;
+    }
+
+    .nowrap {
+        white-space: nowrap;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* SPLITS */
+
+    .table-leg {
+        padding: 0;
+        margin: 0;
+    }
+
+    .table-leg th,
+    .table-leg td {
+        border: 0;
+    }
+
+    .table-leg tr {
+        border-top: 0;
+    }
+
+    .result-1,
+    .result-2,
+    .result-3 {
+        font-weight: bold;
+    }
+
+    .result-1 {
+        /*background: gold;*/
+    }
+
+    .result-2 {
+        /*background: silver;*/
+    }
+
+    .result-3 {
+        /*background: #cd7f32;*/
+    }
+
+    @media print {
+        @page {
+            margin: 0.5cm;
+        }
+
+        body {
+            font-size: 85%;
+        }
+
+        table.sportorg-table {
+            display: table;
+            width: 100%;
+        }
+
+        table.sportorg-table th,
+        table.sportorg-table td {
+            padding: 1px 10px;
+        }
+
+        table.sportorg-table,
+        pre {
+            margin-bottom: 1px;
+        }
+
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1px 0;
+        }
+
+        section, .new-page {
+            page-break-before: always;
+        }
+
+        ul {
+            page-break-inside: avoid;
+        }
+
+        p {
+            widows: 4;
+        }
+
+        a[href^="http"]:after {
+            content: " (" attr(href) ")";
+        }
+
+        abbr[title]:after {
+            content: " (" attr(title) ")";
+        }
+
+        .print-only {
+            display: inline;
+        }
+
+        .no-print {
+            display: none;
+        }
+    }
+</style>
+
+    
+<style>
+    /* SETTINGS */
+    .sportorg-settings {
+        position: fixed;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        background: white;
+        top: 3px;
+        right: 3px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .sportorg-settings-row {
+        margin: 5px;
+    }
+
+    @media print {
+        .sportorg-settings {
+            display: none;
+        }
+    }
+</style>
+<script>
+    var MAX_ORG_NAME = 50;
+    var MAX_PERSON_NAME = 30;
+
+    var TableGenerator = (function () {
+        var Table = function () {
+            return document.createElement('table');
+        };
+        var THead = function () {
+            return document.createElement('thead');
+        };
+        var TBody = function () {
+            return document.createElement('tbody');
+        };
+        var Tr = function () {
+            return document.createElement('tr');
+        };
+        var Th = function () {
+            return document.createElement('th');
+        };
+        var Td = function () {
+            return document.createElement('td');
+        };
+
+        function TableGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableGenerator.prototype.getTable = function (options) {
+            var table = Table();
+            if (options && options.className) table.className = options.className;
+            table.appendChild(this.getHead());
+            table.appendChild(this.getBody());
+            return table;
+        };
+
+        TableGenerator.prototype.getHead = function () {
+            var tr = Tr();
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var th = Th();
+                var title = this.getHeaderName(key);
+                if (title instanceof Node) {
+                    th.appendChild(title);
+                }
+                else {
+                    th.appendChild(document.createTextNode(title));
+                }
+                tr.appendChild(th);
+            }
+            var thead = THead();
+            thead.appendChild(tr);
+            return thead;
+        };
+
+        TableGenerator.prototype.getBody = function () {
+            var tbody = TBody();
+            var cols = this.headers().length;
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                var tr = Tr();
+                if (obj instanceof Node || typeof obj === 'string') {
+                    var td = Td();
+                    td.colSpan = cols;
+                    if (typeof obj === 'string') {
+                        td.appendChild(document.createTextNode(obj));
+                    }
+                    else {
+                        td.appendChild(obj);
+                    }
+                    tr.appendChild(td);
+                }
+                else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var td = Td();
+                        if (obj[key]) {
+                            if (obj[key] instanceof Node) {
+                                td.appendChild(obj[key]);
+                            }
+                            else {
+                                td.appendChild(document.createTextNode(obj[key]));
+                            }
+                        }
+                        tr.appendChild(td);
+                    }
+                }
+                tbody.appendChild(tr);
+            }
+            return tbody;
+        };
+
+        TableGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        return TableGenerator
+    }());
+
+    var TableTextGenerator = (function () {
+
+        function TableTextGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableTextGenerator.prototype.getTable = function (options) {
+            var node = document.createElement('pre');
+            if (options && options.className) node.className = options.className;
+            node.appendChild(this.getHead());
+            node.appendChild(this.getBody());
+            return node;
+        };
+
+        TableTextGenerator.prototype.getSliceText = function (text, size) {
+            if (text === undefined) {
+                text = '';
+            }
+            text = String(text);
+            if (size) {
+                text = text.slice(0, size);
+                if (text.length < size + 1) {
+                    var arr = [];
+                    for (var i = 0; i < size + 1 - text.length; i++) {
+                        arr.push(' ');
+                    }
+                    text += arr.join('');
+                }
+            } else {
+                text += '\t';
+            }
+            return text;
+        };
+
+        TableTextGenerator.prototype.getHead = function () {
+            var text = '';
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var h = this.getHeaderObj(key);
+                var title = h && h.title;
+                var size = h && h.size;
+                if (size) {
+                    text += this.getSliceText(title, size);
+                } else {
+                    text += title;
+                }
+            }
+            text += '\n';
+            var blockU = document.createElement('u');
+            var blockB = document.createElement('b');
+            blockB.appendChild(document.createTextNode(text));
+            blockU.appendChild(blockB);
+            return blockU;
+        };
+
+        TableTextGenerator.prototype.getBody = function () {
+            var text = '';
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                if (typeof obj === 'string') {
+                    text += obj;
+                } else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var h = this.getHeaderObj(key);
+                        var size = h && h.size;
+                        if (size) {
+                            text += this.getSliceText(obj[key], size);
+                        } else {
+                            text += obj[key];
+                        }
+                    }
+                }
+                text += '\n';
+            }
+            return document.createTextNode(text);
+        };
+
+        TableTextGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableTextGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        TableTextGenerator.prototype.getHeaderObj = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field;
+                    }
+                }
+            }
+        };
+
+        return TableTextGenerator
+    }());
+
+    var SettingsGenerator = (function () {
+        var Block = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings';
+            return el
+        };
+        var Row = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings-row';
+            return el
+        };
+
+        function SettingsGenerator(settings) {
+            this.settings = settings;
+            this.isShow = true;
+        }
+
+        SettingsGenerator.prototype.show = function () {
+            var block = Block();
+            this.el = block;
+            for (var _i = 0, _a = this.settings; _i < _a.length; _i++) {
+                var setting = _a[_i];
+                var row = Row();
+                row.className = row.className + ' ' + 'sportorg-settings-hidden';
+                row.appendChild(this.getElBySetting(setting));
+                block.appendChild(row);
+            }
+            var btn = Row();
+            btn.appendChild(this.getHiddenButton());
+            block.appendChild(btn);
+            document.body.appendChild(block);
+            this.toggleHidden();
+        };
+        SettingsGenerator.prototype.getElBySetting = function (setting) {
+            if (typeof setting.value === 'boolean') {
+                var i = document.createElement('input');
+                i.type = 'checkbox';
+                if (setting.value) {
+                    i.checked = true;
+                }
+                if (setting.change) {
+                    i.onchange = function () {
+                        if (i.checked !== setting.value) {
+                            setting.change(i.checked);
+                            setting.value = i.checked;
+                        }
+                    }
+                }
+                var label = document.createElement('label');
+                label.appendChild(i);
+                label.appendChild(document.createTextNode(setting.title));
+                return label
+            } else if (setting.value instanceof Array) {
+                var s = document.createElement('select');
+                for (var _i = 0, _a = setting.value; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    s.appendChild(new Option(obj.text, obj.value));
+                }
+                if (setting.change) {
+                    s.onchange = function () {
+                        var results = [];
+                        for (var _i = 0, _a = s.selectedOptions; _i < _a.length; _i++) {
+                            var item = _a[_i];
+                            results.push(item.value);
+                        }
+                        setting.change(results);
+                    };
+                }
+                var label = document.createElement('label');
+                label.appendChild(document.createTextNode(setting.title));
+                label.appendChild(s);
+                return label
+            }
+        };
+        SettingsGenerator.prototype.toggleHidden = function () {
+            var els = document.getElementsByClassName('sportorg-settings-hidden');
+            for (var _i = 0, els_ = els; _i < els_.length; _i++) {
+                var el = els_[_i];
+                if (this.isShow) {
+                    el.style.display = 'none';
+                    if (this.el) {
+                        this.el.style.opacity = '.3';
+                    }
+                }
+                else {
+                    el.style.display = 'block';
+                    if (this.el) {
+                        this.el.style.opacity = '1';
+                    }
+                }
+            }
+            this.isShow = !this.isShow;
+        };
+        SettingsGenerator.prototype.getHiddenButton = function () {
+            var el = document.createElement('button');
+            el.appendChild(document.createTextNode('SETTINGS'));
+            var _this = this;
+            el.onclick = function (ev) { _this.toggleHidden() };
+            return el;
+        };
+        return SettingsGenerator;
+    }());
+
+    function toHHMMSS(value) {
+        if (value === 0) {
+            return '00:00:00'
+        }
+        if (!value) return '';
+        value /= 1000;
+        var hours = Math.floor(value / 3600);
+        value %= 3600;
+        var minutes = Math.floor(value / 60);
+        var seconds = ~~(value % 60);
+
+        var date = new Date(2000, 0, 1, hours, minutes, seconds);
+
+        var with0 = function (dd) {
+            return (dd < 10 ? '0' + dd : dd) + '';
+        };
+
+        return with0(date.getHours()) + ':' + with0(date.getMinutes()) + ':' + with0(date.getSeconds());
+    }
+
+    function getById(list, id) {
+        if (id) {
+            for (var _i = 0, list_ = list; _i < list_.length; _i++) {
+                var obj = list_[_i];
+                if (obj.id === id) {
+                    return obj;
+                }
+            }
+        }
+        return null;
+    }
+
+    function racePreparation(race) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var obj = _a[_i];
+            obj.organization = getById(race.organizations, obj.organization_id);
+            obj.group = getById(race.groups, obj.group_id);
+        }
+        for (var _b = 0, _c = race.results; _b < _c.length; _b++) {
+            var obj = _c[_b];
+            obj.status = obj.status === 16 ? 1 : obj.status;
+            obj.person = getById(race.persons, obj.person_id);
+        }
+        for (var _d = 0, _e = race.groups; _d < _e.length; _d++) {
+            var obj = _e[_d];
+            obj.course = getById(race.courses, obj.course_id);
+        }
+        for (var _f = 0, _g = ['groups', 'courses', 'organizations']; _f < _g.length; _f++) {
+            var itemName = _g[_f];
+            race[itemName].sort(function (a, b) {
+                if (a.name.toUpperCase() < b.name.toUpperCase())
+                    return -1;
+                if (a.name.toUpperCase() > b.name.toUpperCase())
+                    return 1;
+                return 0;
+            });
+        }
+        return race;
+    }
+
+    function getGroupsBlockElement(race) {
+        var groupBlock = document.createElement('div');
+        groupBlock.className = 'no-print';
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
+            var a = document.createElement('a');
+            a.href = '#' + group.name;
+            a.appendChild(document.createTextNode(group.name + ' '));
+            groupBlock.appendChild(a);
+        }
+        return groupBlock;
+    }
+
+    function dateFormat(date) {
+        date = date ? new Date(date) : new Date();
+		return date.getDate().toString().padStart(2,'0')  + '.' + (date.getMonth() + 1).toString().padStart(2,'0') + '.' + date.getFullYear();
+    }
+
+    var Qualification = {
+        '': 'б/р',
+        0: 'б/р',
+        3: 'IIIю',
+        2: 'IIю',
+        1: 'Iю',
+        6: 'III',
+        5: 'II',
+        4: 'I',
+        7: 'КМС',
+        8: 'МС',
+        9: 'МСМК'
+    };
+
+    var STATUS_PRIORITY = [8, 4, 3, 5, 13];
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+</script>
+
+</head>
+<body>
+<div id="content">
+<div class="text-center">
+    <h3> <br> </h3>
+    <h2>RESULT LIST</h2>
+</div>
+<div id="results-tables"></div>
+
+<style>
+    table.table-split {
+        margin: 0;
+    }
+    table.table-split td{
+        border: 0;
+        padding: 0;
+    }
+</style>
+<script>
+    var race = {"courses": [{"bib": 0, "climb": 10, "controls": [{"code": "31", "length": 0, "object": "CourseControl"}, {"code": "32", "length": 0, "object": "CourseControl"}, {"code": "40", "length": 0, "object": "CourseControl"}, {"code": "51", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "c3e599db-1426-409d-b3d0-e0fdc56bbe36", "length": 1000, "name": "D1", "object": "Course"}], "data": {"chief_referee": "", "description": "", "end_datetime": null, "location": "", "race_type": 0, "relay_leg_count": 3, "secretary": "", "start_datetime": null, "title": "", "url": ""}, "groups": [{"__type": null, "count_finished": 3, "count_person": 3, "course_id": "c3e599db-1426-409d-b3d0-e0fdc56bbe36", "first_number": 0, "id": "a1b4a127-79db-460d-bbab-822265f55489", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 0, "min_age": 0, "min_year": 0, "name": "G", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}], "id": "168ffdb6-6712-4360-adff-4e6a500ce7d0", "object": "Race", "organizations": [{"code": "", "contact": "", "count_person": 3, "country": "", "id": "2895b1bd-12b6-48ec-94f0-bfe556ad27b1", "name": "", "object": "Organization", "region": "", "sex": 0}], "persons": [{"bib": 0, "birth_date": null, "card_number": 4022406, "comment": "", "group_id": "a1b4a127-79db-460d-bbab-822265f55489", "id": "e215179e-b151-465a-899e-c1abbc14ae92", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "TTT", "national_code": "0", "object": "Person", "organization_id": "2895b1bd-12b6-48ec-94f0-bfe556ad27b1", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Testovucic", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 1428804, "comment": "", "group_id": "a1b4a127-79db-460d-bbab-822265f55489", "id": "c3940850-c60b-4087-af33-0b2a85976363", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "TT", "national_code": "0", "object": "Person", "organization_id": "2895b1bd-12b6-48ec-94f0-bfe556ad27b1", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Testovic", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4633676, "comment": "", "group_id": "a1b4a127-79db-460d-bbab-822265f55489", "id": "81c71d91-5219-4cc5-a4fe-28df609ea528", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "T", "national_code": "0", "object": "Person", "organization_id": "2895b1bd-12b6-48ec-94f0-bfe556ad27b1", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Testov", "world_code": "", "year": 0}], "results": [{"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022406, "created_at": 1734053319.7834427, "credit_time": null, "days": 0, "diff": 135000, "diff_scores": 0, "final_result_time": null, "finish_msec": 8923007, "finish_time": 8923007, "id": "253f5ea1-b876-4f24-a3ae-0c1e0fc75d76", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "e215179e-b151-465a-899e-c1abbc14ae92", "place": 2, "result": "02:28:43", "result_current": "02:28:43", "result_current_msec": 8923000, "result_msec": 8923000, "result_relay": "02:28:43", "result_relay_msec": 8923000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "28:43/km", "splits": [{"code": "31", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 3, "leg_time": 8920000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 8920000, "speed": "", "time": 8920000}, {"code": "32", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 1, "leg_time": 1000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 8921000, "speed": "", "time": 8921000}, {"code": "40", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 1, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 8921000, "speed": "", "time": 8921000}, {"code": "51", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 1, "leg_time": 1000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 8922000, "speed": "", "time": 8922000}, {"code": "100", "course_index": 0, "days": 0, "index": 0, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 8922000, "speed": "", "time": 8922000}], "start_msec": 0, "start_time": 8918003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4633676, "created_at": 1734053184.2311594, "credit_time": null, "days": 0, "diff": 0, "diff_scores": 0, "final_result_time": null, "finish_msec": 8788007, "finish_time": 8788007, "id": "80c09db1-c382-4854-b77a-2d78e24a1d19", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "81c71d91-5219-4cc5-a4fe-28df609ea528", "place": 1, "result": "02:26:28", "result_current": "02:26:28", "result_current_msec": 8788000, "result_msec": 8788000, "result_relay": "02:26:28", "result_relay_msec": 8788000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "26:28/km", "splits": [{"code": "31", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 2, "leg_time": 8778000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 8778000, "speed": "", "time": 8778000}, {"code": "32", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 2, "leg_time": 2000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 8780000, "speed": "", "time": 8780000}, {"code": "40", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 2, "leg_time": 2000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 8782000, "speed": "", "time": 8782000}, {"code": "51", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 2, "leg_time": 2000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 8784000, "speed": "", "time": 8784000}, {"code": "100", "course_index": 0, "days": 0, "index": 0, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 8786000, "speed": "", "time": 8786000}], "start_msec": 0, "start_time": 8775003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 1428804, "created_at": 1734052968.4135163, "credit_time": null, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": "01:41:29", "finish_msec": 6089007, "finish_time": 6089007, "id": "8e8b1808-544d-40d9-8e6d-261c925b141b", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "c3940850-c60b-4087-af33-0b2a85976363", "place": -1, "result": "п.п.3.13.12.2", "result_current": "п.п.3.13.12.2", "result_current_msec": 6089000, "result_msec": 6089000, "result_relay": "п.п.3.13.12.2", "result_relay_msec": 6089000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "41:29/km", "splits": [{"code": "49", "course_index": 0, "days": 0, "index": 0, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6045000, "speed": "", "time": 6045000}, {"code": "48", "course_index": 0, "days": 0, "index": 1, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6048000, "speed": "", "time": 6048000}, {"code": "47", "course_index": 0, "days": 0, "index": 2, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6047000, "speed": "", "time": 6047000}, {"code": "46", "course_index": 0, "days": 0, "index": 3, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6045000, "speed": "", "time": 6045000}, {"code": "45", "course_index": 0, "days": 0, "index": 4, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6049000, "speed": "", "time": 6049000}, {"code": "44", "course_index": 0, "days": 0, "index": 5, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6051000, "speed": "", "time": 6051000}, {"code": "43", "course_index": 0, "days": 0, "index": 6, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6058000, "speed": "", "time": 6058000}, {"code": "42", "course_index": 0, "days": 0, "index": 7, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6058000, "speed": "", "time": 6058000}, {"code": "41", "course_index": 0, "days": 0, "index": 8, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6059000, "speed": "", "time": 6059000}, {"code": "40", "course_index": 0, "days": 0, "index": 9, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6061000, "speed": "", "time": 6061000}, {"code": "39", "course_index": 0, "days": 0, "index": 10, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6066000, "speed": "", "time": 6066000}, {"code": "38", "course_index": 0, "days": 0, "index": 11, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6060000, "speed": "", "time": 6060000}, {"code": "37", "course_index": 0, "days": 0, "index": 12, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6062000, "speed": "", "time": 6062000}, {"code": "36", "course_index": 0, "days": 0, "index": 13, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6069000, "speed": "", "time": 6069000}, {"code": "35", "course_index": 0, "days": 0, "index": 14, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6067000, "speed": "", "time": 6067000}, {"code": "34", "course_index": 0, "days": 0, "index": 15, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6101000, "speed": "", "time": 6101000}, {"code": "33", "course_index": 0, "days": 0, "index": 16, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6072000, "speed": "", "time": 6072000}, {"code": "32", "course_index": 0, "days": 0, "index": 17, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6079000, "speed": "", "time": 6079000}, {"code": "31", "course_index": 1, "days": 0, "index": 18, "is_correct": true, "leg_place": 1, "leg_time": 6079000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 6079000, "speed": "", "time": 6079000}, {"code": "55", "course_index": 0, "days": 0, "index": 19, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6076000, "speed": "", "time": 6076000}, {"code": "54", "course_index": 0, "days": 0, "index": 20, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6073000, "speed": "", "time": 6073000}, {"code": "53", "course_index": 0, "days": 0, "index": 21, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6078000, "speed": "", "time": 6078000}, {"code": "52", "course_index": 0, "days": 0, "index": 22, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6083000, "speed": "", "time": 6083000}, {"code": "51", "course_index": 0, "days": 0, "index": 23, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6129000, "speed": "", "time": 6129000}, {"code": "50", "course_index": 0, "days": 0, "index": 24, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6085000, "speed": "", "time": 6085000}, {"code": "100", "course_index": 0, "days": 0, "index": 25, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 6079000, "speed": "", "time": 6079000}], "start_msec": 0, "start_time": 6034003, "status": 4, "status_comment": "п.п.3.13.12.2", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4633676, "created_at": 1734050326.9123855, "credit_time": 0, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": null, "finish_msec": 5930007, "finish_time": 5930007, "id": "a06a829b-043b-4c3d-9c8a-704e1b2e8180", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": 0, "person_id": null, "place": 0, "result": "", "result_current": "01:38:50", "result_current_msec": 5930000, "result_msec": 5930000, "result_relay": "", "result_relay_msec": 5930000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "", "splits": [{"code": "40", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5806000}, {"code": "41", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5810000}, {"code": "42", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5814000}, {"code": "43", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5817000}, {"code": "44", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5814000}, {"code": "45", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5815000}, {"code": "46", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5816000}, {"code": "47", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5822000}, {"code": "48", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5826000}, {"code": "49", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5827000}, {"code": "31", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5893000}, {"code": "32", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5896000}, {"code": "33", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5893000}, {"code": "34", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5926000}, {"code": "35", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5896000}, {"code": "36", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5901000}, {"code": "37", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5897000}, {"code": "38", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5899000}, {"code": "39", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5908000}, {"code": "50", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 5909000}], "start_msec": 0, "start_time": 5792003, "status": 1, "status_comment": "", "system_type": 2}], "settings": {"ignore_punches_before_start": false, "live_enabled": false, "marked_route_dont_dsq": false, "marked_route_if_counting_lap": false, "marked_route_if_station_check": false, "marked_route_max_penalty_by_cp": false, "marked_route_mode": "off", "marked_route_penalty_lap_station_code": 80, "marked_route_penalty_time": 60000, "readout_duplicate_timeout": 15000, "result_processing_fixed_score_value": 1, "result_processing_mode": "time", "result_processing_score_mode": "rogain", "result_processing_scores_allow_duplicates": false, "result_processing_scores_max_overrun_time": 1800000, "result_processing_scores_minute_penalty": 1, "scores_array": "40,37,35,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1", "scores_formula": "200 - 100 * time / leader", "scores_mode": "off", "system_assign_chip_reading": "off", "system_assignment_mode": false, "system_duplicate_chip_processing": "several_results", "system_finish_cp_number": 90, "system_finish_source": "station", "system_missed_finish": "zero", "system_port": "COM6", "system_start_cp_number": 31, "system_start_source": "protocol", "time_accuracy": 0, "time_format_24": "less24", "time_rounding": "down"}};
+    var selected = {"persons": []};
+    racePreparation(race);
+
+    var isRogaine = race.settings.result_processing_mode === 'scores';
+    var isArdf =  race.settings.result_processing_mode === 'ardf';
+
+    function getResultsByGroup(group, count) {
+        count = +count || 0;
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
+            var result = _a[_i];
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id && (count ? result.place <= count && result.place > 0 : 1)) {
+                var r = {
+                    index: 0,
+                    name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
+                    org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[result.person.qual],
+                    bib: result.person.bib,
+                    year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_laps: result.penalty_laps,
+                    scores_ardf: result.scores_ardf,
+                    rogaine_score: result.rogaine_score,
+                    rogaine_penalty: result.rogaine_penalty,
+                    rogaine_points_earned: result.rogaine_score + result.rogaine_penalty,
+                    result: result.result_current,
+                    result_relay: result.result_relay,
+                    result_msec: result.result_msec,
+                    diff: isRogaine || isArdf ? result.diff_scores : toHHMMSS(result.diff),
+                    place: result.place,
+                    status: result.status,
+                    scores: result.scores,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    is_out_of_competition: result.person.is_out_of_competition,
+                    speed: result.speed,
+                    data: result
+                };
+                if (result.status !== 1) {
+                    r.diff = '';
+                    r.place_show = '';
+                    r.speed = '';
+                    r.scores = '';
+                    r.rogaine_points_earned = '';
+                    r.rogaine_penalty = '';
+                    r.rogaine_score = '';
+                }
+
+                // SPLITS
+                var control_index = 0;
+                if (result.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
+                    var lastSplit = 0;
+                    for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+
+                            var tbl = document.createElement('table');
+                            tbl.className = 'table-split';
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')', split.leg_place));
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')', split.relative_place));
+                            r[control_index + '_' + split.code] = tbl;
+                            control_index++;
+                            lastSplit = split.relative_time;
+                        }
+                    }
+
+                    var finishMsec = r.result_msec - lastSplit;
+
+                    if (r.status === 1 && finishMsec > 0) {
+                        var tblF = document.createElement('table');
+                        tblF.className = 'table-split';
+                        tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
+                        var place_str = r.place > 0 ? r.place : 'o/c';
+                        tblF.appendChild(getTrBlock(toHHMMSS(r.result_msec) + ' (' + place_str + ')', r.place));
+                        r.finish_split = tblF;
+                    }
+                }
+
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
+                // ALL PUNCHES
+                var splitTable = document.createElement('table');
+                splitTable.className = 'table-split';
+                var splitTr = document.createElement('tr');
+                splitTable.appendChild(splitTr);
+                var prevTime = result.start_msec;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
+                    var tbl = document.createElement('table');
+                    tbl.className = 'table-split';
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    var splitTd = document.createElement('td');
+                    splitTd.appendChild(tbl);
+                    splitTr.appendChild(splitTd);
+                    prevTime = split.time;
+                }
+                r.all_splits = splitTable;
+
+                results.push(r);
+            }
+        }
+        results.sort(function (a, b) {
+            if (isRelay) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                }
+                return a.place - b.place
+
+            } else {
+                if (a.status !== 1 && b.status !== 1) {
+                    return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                }
+                if (a.status !== 1) {
+                    return 1
+                }
+                if (b.status !== 1) {
+                    return -1
+                }
+                if (a.is_out_of_competition || b.is_out_of_competition) {
+                    if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                        return -(a.rogaine_score - b.rogaine_score);
+                    }
+                    if (isArdf && a.scores_ardf != b.scores_ardf) {
+                        return -(a.scores_ardf - b.scores_ardf);
+                    }
+                    return a.result_msec - b.result_msec;
+                }
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                return a.place - b.place
+            }
+        });
+        var index = 0;
+        if (isRelay) {
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000;
+                }
+                results.push(r);
+            }
+        } else {
+            results.forEach(function (elem) {
+                index++;
+                elem.index = index;
+            })
+        }
+        return results;
+    }
+	function getResultsByCourse(group, count) {
+		count = +count || 0;
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        var splits_recalc_times = {};
+        var splits_recalc_times_total = {};
+        group.controls.forEach(function (control, index) {
+            splits_recalc_times[index + '_' + control.code] = [];
+            splits_recalc_times_total[index + '_' + control.code] = [];
+        });
+        for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
+            var result = _a[_i];
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.course && result.person.group.course.id === group.id) { //} && (count ? result.place <= count && result.place > 0 : 1)) {
+                var r = {
+                    index: 0,
+                    name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
+                    org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[result.person.qual],
+                    bib: result.person.bib,
+                    year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_laps: result.penalty_laps,
+                    scores_ardf: result.scores_ardf,
+                    rogaine_score: result.rogaine_score,
+                    rogaine_penalty: result.rogaine_penalty,
+                    rogaine_points_earned: result.rogaine_score + result.rogaine_penalty,
+                    result: result.result_current,
+                    result_msec: result.result_msec,
+                    diff: isRogaine || isArdf ? result.diff_scores : toHHMMSS(result.diff),
+                    place: result.place,
+                    status: result.status,
+                    scores: result.scores,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    is_out_of_competition: result.person.is_out_of_competition,
+                    speed: result.speed,
+					group: result.person.group.name,
+                    data: result
+                };
+                if (result.status !== 1) {
+                    r.diff = '';
+                    r.place_show = '';
+                    r.speed = '';
+                    r.scores = '';
+                    r.rogaine_points_earned = '';
+                    r.rogaine_penalty = '';
+                    r.rogaine_score = '';
+                }
+
+                // SPLITS
+                var control_index = 0;
+                if (result.splits) {
+                    for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+                            if ((control_index + '_' + split.code) in splits_recalc_times){
+                                splits_recalc_times[control_index + '_' + split.code].push(split.leg_time);
+                                splits_recalc_times_total[control_index + '_' + split.code].push(split.relative_time);
+                            }
+                            control_index++;
+                        }
+                    }
+                }
+
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
+                // ALL PUNCHES
+                var splitTable = document.createElement('table');
+                splitTable.className = 'table-split';
+                var splitTr = document.createElement('tr');
+                splitTable.appendChild(splitTr);
+                var prevTime = result.start_msec;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
+                    var tbl = document.createElement('table');
+                    tbl.className = 'table-split';
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    var splitTd = document.createElement('td');
+                    splitTd.appendChild(tbl);
+                    splitTr.appendChild(splitTd);
+                    prevTime = split.time;
+                }
+                r.all_splits = splitTable;
+
+                results.push(r);
+            }
+        }
+        results.sort(function (a, b) {
+            if (isRelay) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                }
+                return a.place - b.place
+            } else {
+                if (a.status !== 1 && b.status !== 1) {
+                    return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                }
+                if (a.status !== 1) {
+                    return 1
+                }
+                if (b.status !== 1) {
+                    return -1
+                }
+                if (a.is_out_of_competition || b.is_out_of_competition) {
+                    if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                        return -(a.rogaine_score - b.rogaine_score);
+                    }
+                    if (isArdf && a.scores_ardf != b.scores_ardf) {
+                        return -(a.scores_ardf - b.scores_ardf);
+                    }
+                    return a.result_msec - b.result_msec;
+                }
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                    return -(a.rogaine_score - b.rogaine_score);
+                }
+                if (isArdf && a.scores_ardf != b.scores_ardf) {
+                    return -(a.scores_ardf - b.scores_ardf);
+                }
+                return a.result_msec - b.result_msec;
+            }
+        });
+        var sort_splits_recalc_fnc = function(a,b){
+            return a-b;
+        }
+        group.controls.forEach(function (control, index) {
+            splits_recalc_times[index + '_' + control.code].sort(sort_splits_recalc_fnc);
+            splits_recalc_times_total[index + '_' + control.code].sort(sort_splits_recalc_fnc);
+        });
+        var index = 0;
+        if (isRelay) {
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000;
+                }
+                results.push(r);
+            }
+        } else {
+            var get_score = function(res){
+                if (isRogaine) return res.rogaine_score;
+                if (isArdf) return res.scores_ardf;
+                return 0
+            }
+            var newplace = 1;
+			var doubleplace = -1;
+			var best_result_msec = results[0] ? results[0].result_msec : 0;
+			var last_result_msec = results[0] ? results[0].result_msec : 0;
+            var best_score = results[0] ? get_score(results[0]) : 0;
+            var binary_search = function(arr,required){
+				if (!arr){
+					return 0;
+				}
+                var l = -1;
+                var r = arr.length-1;
+                while (r-l>1){
+                    var m = Math.floor((l+r)/2);
+                    if (arr[m]>=required){
+                        r = m;
+                    } else {
+                        l = m;
+                    }
+                }
+                if (arr[r]==required){
+                    return r+1;
+                }
+                return 0;
+            }
+            results.forEach(function (elem) {
+                index++;
+                elem.index = index;
+				if (!elem.data.person.is_out_of_competition && elem.place !== 0 && elem.place !== -1) {
+					if (isRogaine || isArdf || last_result_msec < elem.result_msec){
+						newplace += 1 + doubleplace;
+						doubleplace = 0;
+						last_result_msec = elem.result_msec;
+					} else {
+						doubleplace++;
+					}
+					elem.diff = isRogaine || isArdf ? best_score - get_score(elem) : toHHMMSS(elem.result_msec - best_result_msec);
+					elem.place = newplace;
+					elem.place_show = newplace;
+                }
+                var control_index = 0;
+                if (elem.data.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
+                    var lastSplit = 0;
+                    for (var _b = 0, _c = elem.data.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+                            var leg_place = binary_search(splits_recalc_times[control_index + '_' + split.code],split.leg_time);
+                            var relative_place = binary_search(splits_recalc_times_total[control_index + '_' + split.code],split.relative_time);
+                            if (leg_place>0 && relative_place>0){
+                                var tbl = document.createElement('table');
+                                tbl.className = 'table-split';
+                                tbl.appendChild(getTrBlock(toHHMMSS(split.leg_time) + ' (' + leg_place + ')', leg_place));
+                                tbl.appendChild(getTrBlock(toHHMMSS(split.relative_time) + ' (' + relative_place + ')', relative_place));
+                                elem[control_index + '_' + split.code] = tbl;
+                            }
+                            control_index++;
+                            lastSplit = split.relative_time;
+                        }
+                    }
+
+                    var finishMsec = elem.result_msec - lastSplit;
+
+                    if (elem.status === 1 && finishMsec > 0) {
+                        var tblF = document.createElement('table');
+                        tblF.className = 'table-split';
+                        tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
+                        tblF.appendChild(getTrBlock(toHHMMSS(elem.result_msec) + ' (' + elem.place_show + ')', elem.place));
+                        elem.finish_split = tblF;
+                    }
+                }
+            });
+        }
+        return results;
+    }
+
+    function getRankingByGroup(group) {
+        var rankingBlock = document.createElement('span');
+        var ranking = group.ranking;
+        if (ranking && ranking.is_active && ranking.rank_scores > 0) {
+            var text = 'Ranking, scores: ' + ranking.rank_scores.toFixed(0);
+            rankingBlock.appendChild(document.createTextNode(text));
+
+            for (var _i = 0; _i < ranking.rank.length; _i++) {
+                var rank = ranking.rank[_i];
+                if (rank.is_active) {
+                    if (rank.max_place > 0) {
+                        var text = Qualification[rank.qual] + ' - up to ' + rank.max_place + ' place';
+                        rankingBlock.appendChild(document.createElement("br"));
+                        rankingBlock.appendChild(document.createTextNode(text));
+                    }
+                    else {
+                        if (rank.max_time > 0) {
+                            var text = Qualification[rank.qual] + ' - ' + toHHMMSS(rank.max_time);
+                            if (rank.percent > 0) {
+                                text += ' (' + rank.percent + '%)';
+                            }
+                            rankingBlock.appendChild(document.createElement("br"));
+                            rankingBlock.appendChild(document.createTextNode(text));
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            var text = 'Rank was not calculated';
+            rankingBlock.appendChild(document.createTextNode(text));
+        }
+
+        return rankingBlock;
+    }
+
+    var Fields = {
+        fields: [
+            {key: 'index', title: '№', size: 4},
+            {key: 'group', title: 'Class', size: 10, active: false},
+            {key: 'name', title: 'Name', size: 30},
+            {key: 'org', title: 'Orgznization', size: 20},
+            {key: 'year', title: 'Year', size: 5},
+            {key: 'bib', title: 'Bib', size: 6},
+            {key: 'penalty_time', title: 'Penalty', size: 9, active: false},
+            {key: 'penalty_laps', title: 'Penalty,l', size: 9, active: false},
+            {key: 'scores_ardf', title: 'ARDF', size: 4, active: isArdf},
+            {key: 'rogaine_points_earned', title: 'Total', size: 5, active: isRogaine},
+            {key: 'rogaine_penalty', title: 'Pen.', size: 4, active: isRogaine},
+            {key: 'rogaine_score', title: 'Pts', size: 4, active: isRogaine},
+            {key: 'result', title: 'Result', size: 14},
+            {key: 'result_relay', title: 'Team result', size: 14},
+            {key: 'diff', title: 'Diff', size: 11, active: !isArdf && !isRogaine},
+            {key: 'speed', title: 'Pace', size: 12, active: false},
+            {key: 'place_show', title: 'Place', size: 6},
+            {key: 'scores', title: 'Scores', size: 5, active: false},
+            {key: 'all_splits', title: 'Splits', active: false}
+        ],
+        active: function (key, val) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    obj.active = val;
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    }
+                    else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        getField: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    return obj
+                }
+            }
+        },
+        getCopyFields: function () {
+            return JSON.parse(JSON.stringify(this.fields))
+        },
+        init: function () {
+            try {
+                var isRelay = race.data.race_type === 3
+                this.getField('all_splits').active = location.href.indexOf('all_splits=1') > -1;
+                this.getField('scores').active = location.href.indexOf('scores=1') > -1;
+                this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
+
+                this.getField('result_relay').active = isRelay
+            } catch (e){}
+            return this;
+        }
+    }.init();
+
+    store = {
+        showLinkForGroups: true
+    };
+
+    try {
+        store.splitsShow = location.href.indexOf('s_splits=1') > -1;
+        store.rankingShow = location.href.indexOf('ranking=1') > -1;
+        store.showProtocolByCourse = location.href.indexOf('by_course=1') > -1;
+    } catch (e) {}
+
+    function render() {
+        var resultBlock = document.getElementById('results-tables');
+        resultBlock.innerHTML = '';
+        Fields.active('group', store.showProtocolByCourse);
+        if (store.showProtocolByCourse){
+            var _a = race.courses;
+        } else {
+            var _a = race.groups;
+        }
+        for (var _i = 0; _i < _a.length; _i++) {
+            if (store.showProtocolByCourse){
+                var course = _a[_i];
+                var rows = getResultsByCourse(course, store.count);
+                var groupName = course.name;
+            } else {
+                var group = _a[_i];
+                var rows = getResultsByGroup(group, store.count);
+                var course = group.course;
+                var groupName = group.name;
+            }
+            if (!rows.length) {
+                continue;
+            }
+            var titleBlock = document.createElement('h2');
+            titleBlock.id = groupName;
+            var groupTitle = groupName;
+            if (course && course.controls && course.controls.length){
+                groupTitle += ', ' + course.controls.length + ' controls';
+            }
+            if (course && course.length){
+                groupTitle += ', ' + course.length / 1000 + ' km';
+            }
+            titleBlock.appendChild(document.createTextNode(groupTitle));
+            resultBlock.appendChild(titleBlock);
+            if (!store.showProtocolByCourse && store.showLinkForGroups) {
+                resultBlock.appendChild(getGroupsBlockElement(race));
+            }
+            var fields = Fields.getCopyFields();
+            if (store.splitsShow && course) {
+                course.controls.forEach(function (control, index) {
+                    fields.push({key: index + '_' + control.code, title: control.code})
+                });
+                fields.push({key: 'finish_split', title: 'F'})
+            }
+            if (!store.tableView && !store.splitsShow && !Fields.isActive('all_splits')) {
+                resultBlock.appendChild(new TableTextGenerator(rows, fields).getTable());
+            } else {
+                resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            }
+            //show ranking information
+            if (!store.showProtocolByCourse && store.rankingShow) {
+                resultBlock.appendChild(getRankingByGroup(group))
+            }
+            if (store.newPage && _i < _a.length - 1) {
+                var newPage = document.createElement('div');
+                newPage.className = 'new-page';
+                resultBlock.appendChild(newPage);
+            }
+        }
+        var query = {
+            s_splits: store.splitsShow ? 1 : 0,
+            ranking: store.rankingShow ? 1 : 0,
+            by_course: store.showProtocolByCourse ? 1 : 0,
+            all_splits: Fields.isActive('all_splits') ? 1 : 0,
+            scores: Fields.isActive('scores') ? 1 : 0,
+            penalty_time: Fields.isActive('penalty_time') ? 1 : 0
+        };
+        var queryString = '?';
+        Object.keys(query).forEach(function (key) {
+            if (query[key]) {
+                queryString += key + '=' + query[key] + '&';
+            }
+        });
+        queryString += 'sportorg=1';
+        try {
+            var href = location.href.split('?')[0];
+            history.pushState({}, null, href + queryString);
+        } catch (e) {}
+    }
+
+    render();
+
+    var Scrolling = {
+        direction: 1,
+        enabled: false,
+        lock: false,
+        prev: 0,
+        intervalTimer: 0,
+        init: function () {
+            var _this = this;
+            if (_this.intervalTimer) {
+                clearInterval(_this.intervalTimer)
+            }
+            _this.intervalTimer = setInterval(function () {
+                _this.lock = !_this.lock;
+            }, 5000);
+            window.onscroll = function () {
+                var d = document.documentElement;
+                var offset = d.scrollTop + window.innerHeight;
+                var height = d.offsetHeight;
+
+                if (offset === height) {
+                    _this.direction = -1;
+                }
+                if (offset <= window.innerHeight) {
+                    _this.direction = 1;
+                }
+            };
+            this.pageScroll();
+            return this;
+        },
+        pageScroll: function () {
+            var _this = this;
+            if (_this.enabled && ! _this.lock) {
+                window.scrollBy(10, _this.direction);
+            }
+            setTimeout(function () {
+                _this.pageScroll();
+            }, 10);
+        }
+    }.init();
+
+    new SettingsGenerator([
+        {
+            title: 'Classes links',
+            value: !!store.showLinkForGroups,
+            change: function (checked) {
+                store.showLinkForGroups = checked;
+                render()
+            }
+        },
+        {
+            title: 'Results by courses',
+            value: !!store.showProtocolByCourse,
+            change: function (checked) {
+                store.showProtocolByCourse = checked;
+                render()
+            }
+        },
+        {
+            title: 'Table view',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
+        {
+            title: 'Bib',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Penalty time',
+            value: Fields.isActive('penalty_time'),
+            change: function (checked) {
+                Fields.active('penalty_time', checked);
+                render()
+            }
+        },
+        {
+            title: 'Penalty laps',
+            value: Fields.isActive('penalty_laps'),
+            change: function (checked) {
+                Fields.active('penalty_laps', checked);
+                render()
+            }
+        },
+        {
+            title: 'Diff',
+            value: Fields.isActive('diff'),
+            change: function (checked) {
+                Fields.active('diff', checked);
+                render()
+            }
+        },
+        {
+            title: 'Pace',
+            value: Fields.isActive('speed'),
+            change: function (checked) {
+                Fields.active('speed', checked);
+                render()
+            }
+        },
+        {
+            title: 'Splits (no forking)',
+            value: !!store.splitsShow,
+            change: function (checked) {
+                store.splitsShow = checked;
+                render()
+            }
+        },
+        {
+            title: 'Splits (all)',
+            value: Fields.isActive('all_splits'),
+            change: function (checked) {
+                Fields.active('all_splits', checked);
+                render()
+            }
+        },
+        {
+            title: 'Scores',
+            value: Fields.isActive('scores'),
+            change: function (checked) {
+                Fields.active('scores', checked);
+                render()
+            }
+        },
+        {
+            title: 'Ranking (Russian)',
+            value: store.rankingShow,
+            change: function (checked) {
+                store.rankingShow = checked;
+                render()
+            }
+        },
+        {
+            title: 'Show first: ',
+            value: [
+                {text: 'All', value: 0},
+                {text: '1', value: 1},
+                {text: '3', value: 3},
+                {text: '4', value: 4},
+                {text: '5', value: 5},
+                {text: '6', value: 6},
+                {text: '10', value: 10}
+            ],
+            change: function (arr) {
+                store.count = arr[0];
+                render();
+            }
+        },
+        {
+            title: 'Each class from new page',
+            value: false,
+            change: function (checked) {
+                store.newPage = checked;
+                render()
+            }
+        },
+        {
+            title: 'Autoscroll',
+            value: Scrolling.enabled,
+            change: function (checked) {
+                Scrolling.enabled = checked;
+            }
+        },
+    ]).show();
+</script>
+
+</div>
+<div id="footer">
+    
+    <a href="https://sportorg.readthedocs.io">ПО SportOrg v1.7.1</a>
+    <script type="text/javascript">
+        var l = new Date();
+        document.write ('<span class="print-only">Время печати: ' + l.toLocaleString() + '</span>');
+    </script>
+    
+</div>
+</body>
+</html>
