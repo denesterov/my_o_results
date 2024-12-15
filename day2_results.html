@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+    <title>Results - SportOrg</title>
+    
+    
+<style>
+    p,
+    blockquote,
+    ul,
+    ol,
+    dl,
+    table,
+    pre {
+        margin-top: 0;
+        margin-bottom: 16px;
+    }
+
+    table.sportorg-table {
+        display: block;
+        width: 100%;
+        overflow: visible;
+        word-break: keep-all;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    table.sportorg-table th {
+        font-weight: bold;
+        border-bottom: 2px solid black;
+        margin-bottom: 5px;
+    }
+
+    table.sportorg-table th,
+    table.sportorg-table td {
+        padding: 3px 13px;
+        text-align: left;
+        /*border: 1px solid #ddd;*/
+    }
+
+    table.sportorg-table tr {
+        background-color: #fff;
+        /*border-top: 1px solid #ccc;*/
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    /*table.sportorg-table tr:nth-child(2n) {*/
+        /*background-color: #f8f8f8;*/
+    /*}*/
+
+    table.empty-table {
+        width: auto;
+    }
+
+    table.empty-table tr {
+        background-color: white;
+        border: 0;
+    }
+
+    table.empty-table td, table.empty-table th {
+        border: 0;
+    }
+
+    hr {
+        box-sizing: content-box;
+        height: 0;
+    }
+
+    hr {
+        height: 0;
+        margin: 15px 0;
+        overflow: hidden;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    hr:before {
+        display: table;
+        content: "";
+    }
+
+    hr:after {
+        display: table;
+        clear: both;
+        content: "";
+    }
+
+    hr {
+        height: 4px;
+        padding: 0;
+        margin: 16px 0;
+        background-color: #e7e7e7;
+        border: 0 none;
+    }
+
+    a:not([href]) {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    a {
+        color: #4078c0;
+        text-decoration: none;
+    }
+
+    a:hover,
+    a:active {
+        text-decoration: underline;
+    }
+
+    a {
+        background-color: transparent;
+    }
+
+    a:active,
+    a:hover {
+        outline: 0;
+    }
+
+    .print-only {
+        display: none;
+    }
+
+    .no-print {
+        display: block;
+    }
+
+    .nowrap {
+        white-space: nowrap;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* SPLITS */
+
+    .table-leg {
+        padding: 0;
+        margin: 0;
+    }
+
+    .table-leg th,
+    .table-leg td {
+        border: 0;
+    }
+
+    .table-leg tr {
+        border-top: 0;
+    }
+
+    .result-1,
+    .result-2,
+    .result-3 {
+        font-weight: bold;
+    }
+
+    .result-1 {
+        /*background: gold;*/
+    }
+
+    .result-2 {
+        /*background: silver;*/
+    }
+
+    .result-3 {
+        /*background: #cd7f32;*/
+    }
+
+    @media print {
+        @page {
+            margin: 0.5cm;
+        }
+
+        body {
+            font-size: 85%;
+        }
+
+        table.sportorg-table {
+            display: table;
+            width: 100%;
+        }
+
+        table.sportorg-table th,
+        table.sportorg-table td {
+            padding: 1px 10px;
+        }
+
+        table.sportorg-table,
+        pre {
+            margin-bottom: 1px;
+        }
+
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1px 0;
+        }
+
+        section, .new-page {
+            page-break-before: always;
+        }
+
+        ul {
+            page-break-inside: avoid;
+        }
+
+        p {
+            widows: 4;
+        }
+
+        a[href^="http"]:after {
+            content: " (" attr(href) ")";
+        }
+
+        abbr[title]:after {
+            content: " (" attr(title) ")";
+        }
+
+        .print-only {
+            display: inline;
+        }
+
+        .no-print {
+            display: none;
+        }
+    }
+</style>
+
+    
+<style>
+    /* SETTINGS */
+    .sportorg-settings {
+        position: fixed;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        background: white;
+        top: 3px;
+        right: 3px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .sportorg-settings-row {
+        margin: 5px;
+    }
+
+    @media print {
+        .sportorg-settings {
+            display: none;
+        }
+    }
+</style>
+<script>
+    var MAX_ORG_NAME = 50;
+    var MAX_PERSON_NAME = 30;
+
+    var TableGenerator = (function () {
+        var Table = function () {
+            return document.createElement('table');
+        };
+        var THead = function () {
+            return document.createElement('thead');
+        };
+        var TBody = function () {
+            return document.createElement('tbody');
+        };
+        var Tr = function () {
+            return document.createElement('tr');
+        };
+        var Th = function () {
+            return document.createElement('th');
+        };
+        var Td = function () {
+            return document.createElement('td');
+        };
+
+        function TableGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableGenerator.prototype.getTable = function (options) {
+            var table = Table();
+            if (options && options.className) table.className = options.className;
+            table.appendChild(this.getHead());
+            table.appendChild(this.getBody());
+            return table;
+        };
+
+        TableGenerator.prototype.getHead = function () {
+            var tr = Tr();
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var th = Th();
+                var title = this.getHeaderName(key);
+                if (title instanceof Node) {
+                    th.appendChild(title);
+                }
+                else {
+                    th.appendChild(document.createTextNode(title));
+                }
+                tr.appendChild(th);
+            }
+            var thead = THead();
+            thead.appendChild(tr);
+            return thead;
+        };
+
+        TableGenerator.prototype.getBody = function () {
+            var tbody = TBody();
+            var cols = this.headers().length;
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                var tr = Tr();
+                if (obj instanceof Node || typeof obj === 'string') {
+                    var td = Td();
+                    td.colSpan = cols;
+                    if (typeof obj === 'string') {
+                        td.appendChild(document.createTextNode(obj));
+                    }
+                    else {
+                        td.appendChild(obj);
+                    }
+                    tr.appendChild(td);
+                }
+                else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var td = Td();
+                        if (obj[key]) {
+                            if (obj[key] instanceof Node) {
+                                td.appendChild(obj[key]);
+                            }
+                            else {
+                                td.appendChild(document.createTextNode(obj[key]));
+                            }
+                        }
+                        tr.appendChild(td);
+                    }
+                }
+                tbody.appendChild(tr);
+            }
+            return tbody;
+        };
+
+        TableGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        return TableGenerator
+    }());
+
+    var TableTextGenerator = (function () {
+
+        function TableTextGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableTextGenerator.prototype.getTable = function (options) {
+            var node = document.createElement('pre');
+            if (options && options.className) node.className = options.className;
+            node.appendChild(this.getHead());
+            node.appendChild(this.getBody());
+            return node;
+        };
+
+        TableTextGenerator.prototype.getSliceText = function (text, size) {
+            if (text === undefined) {
+                text = '';
+            }
+            text = String(text);
+            if (size) {
+                text = text.slice(0, size);
+                if (text.length < size + 1) {
+                    var arr = [];
+                    for (var i = 0; i < size + 1 - text.length; i++) {
+                        arr.push(' ');
+                    }
+                    text += arr.join('');
+                }
+            } else {
+                text += '\t';
+            }
+            return text;
+        };
+
+        TableTextGenerator.prototype.getHead = function () {
+            var text = '';
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var h = this.getHeaderObj(key);
+                var title = h && h.title;
+                var size = h && h.size;
+                if (size) {
+                    text += this.getSliceText(title, size);
+                } else {
+                    text += title;
+                }
+            }
+            text += '\n';
+            var blockU = document.createElement('u');
+            var blockB = document.createElement('b');
+            blockB.appendChild(document.createTextNode(text));
+            blockU.appendChild(blockB);
+            return blockU;
+        };
+
+        TableTextGenerator.prototype.getBody = function () {
+            var text = '';
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                if (typeof obj === 'string') {
+                    text += obj;
+                } else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var h = this.getHeaderObj(key);
+                        var size = h && h.size;
+                        if (size) {
+                            text += this.getSliceText(obj[key], size);
+                        } else {
+                            text += obj[key];
+                        }
+                    }
+                }
+                text += '\n';
+            }
+            return document.createTextNode(text);
+        };
+
+        TableTextGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableTextGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        TableTextGenerator.prototype.getHeaderObj = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field;
+                    }
+                }
+            }
+        };
+
+        return TableTextGenerator
+    }());
+
+    var SettingsGenerator = (function () {
+        var Block = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings';
+            return el
+        };
+        var Row = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings-row';
+            return el
+        };
+
+        function SettingsGenerator(settings) {
+            this.settings = settings;
+            this.isShow = true;
+        }
+
+        SettingsGenerator.prototype.show = function () {
+            var block = Block();
+            this.el = block;
+            for (var _i = 0, _a = this.settings; _i < _a.length; _i++) {
+                var setting = _a[_i];
+                var row = Row();
+                row.className = row.className + ' ' + 'sportorg-settings-hidden';
+                row.appendChild(this.getElBySetting(setting));
+                block.appendChild(row);
+            }
+            var btn = Row();
+            btn.appendChild(this.getHiddenButton());
+            block.appendChild(btn);
+            document.body.appendChild(block);
+            this.toggleHidden();
+        };
+        SettingsGenerator.prototype.getElBySetting = function (setting) {
+            if (typeof setting.value === 'boolean') {
+                var i = document.createElement('input');
+                i.type = 'checkbox';
+                if (setting.value) {
+                    i.checked = true;
+                }
+                if (setting.change) {
+                    i.onchange = function () {
+                        if (i.checked !== setting.value) {
+                            setting.change(i.checked);
+                            setting.value = i.checked;
+                        }
+                    }
+                }
+                var label = document.createElement('label');
+                label.appendChild(i);
+                label.appendChild(document.createTextNode(setting.title));
+                return label
+            } else if (setting.value instanceof Array) {
+                var s = document.createElement('select');
+                for (var _i = 0, _a = setting.value; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    s.appendChild(new Option(obj.text, obj.value));
+                }
+                if (setting.change) {
+                    s.onchange = function () {
+                        var results = [];
+                        for (var _i = 0, _a = s.selectedOptions; _i < _a.length; _i++) {
+                            var item = _a[_i];
+                            results.push(item.value);
+                        }
+                        setting.change(results);
+                    };
+                }
+                var label = document.createElement('label');
+                label.appendChild(document.createTextNode(setting.title));
+                label.appendChild(s);
+                return label
+            }
+        };
+        SettingsGenerator.prototype.toggleHidden = function () {
+            var els = document.getElementsByClassName('sportorg-settings-hidden');
+            for (var _i = 0, els_ = els; _i < els_.length; _i++) {
+                var el = els_[_i];
+                if (this.isShow) {
+                    el.style.display = 'none';
+                    if (this.el) {
+                        this.el.style.opacity = '.3';
+                    }
+                }
+                else {
+                    el.style.display = 'block';
+                    if (this.el) {
+                        this.el.style.opacity = '1';
+                    }
+                }
+            }
+            this.isShow = !this.isShow;
+        };
+        SettingsGenerator.prototype.getHiddenButton = function () {
+            var el = document.createElement('button');
+            el.appendChild(document.createTextNode('SETTINGS'));
+            var _this = this;
+            el.onclick = function (ev) { _this.toggleHidden() };
+            return el;
+        };
+        return SettingsGenerator;
+    }());
+
+    function toHHMMSS(value) {
+        if (value === 0) {
+            return '00:00:00'
+        }
+        if (!value) return '';
+        value /= 1000;
+        var hours = Math.floor(value / 3600);
+        value %= 3600;
+        var minutes = Math.floor(value / 60);
+        var seconds = ~~(value % 60);
+
+        var date = new Date(2000, 0, 1, hours, minutes, seconds);
+
+        var with0 = function (dd) {
+            return (dd < 10 ? '0' + dd : dd) + '';
+        };
+
+        return with0(date.getHours()) + ':' + with0(date.getMinutes()) + ':' + with0(date.getSeconds());
+    }
+
+    function getById(list, id) {
+        if (id) {
+            for (var _i = 0, list_ = list; _i < list_.length; _i++) {
+                var obj = list_[_i];
+                if (obj.id === id) {
+                    return obj;
+                }
+            }
+        }
+        return null;
+    }
+
+    function racePreparation(race) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var obj = _a[_i];
+            obj.organization = getById(race.organizations, obj.organization_id);
+            obj.group = getById(race.groups, obj.group_id);
+        }
+        for (var _b = 0, _c = race.results; _b < _c.length; _b++) {
+            var obj = _c[_b];
+            obj.status = obj.status === 16 ? 1 : obj.status;
+            obj.person = getById(race.persons, obj.person_id);
+        }
+        for (var _d = 0, _e = race.groups; _d < _e.length; _d++) {
+            var obj = _e[_d];
+            obj.course = getById(race.courses, obj.course_id);
+        }
+        for (var _f = 0, _g = ['groups', 'courses', 'organizations']; _f < _g.length; _f++) {
+            var itemName = _g[_f];
+            race[itemName].sort(function (a, b) {
+                if (a.name.toUpperCase() < b.name.toUpperCase())
+                    return -1;
+                if (a.name.toUpperCase() > b.name.toUpperCase())
+                    return 1;
+                return 0;
+            });
+        }
+        return race;
+    }
+
+    function getGroupsBlockElement(race) {
+        var groupBlock = document.createElement('div');
+        groupBlock.className = 'no-print';
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
+            var a = document.createElement('a');
+            a.href = '#' + group.name;
+            a.appendChild(document.createTextNode(group.name + ' '));
+            groupBlock.appendChild(a);
+        }
+        return groupBlock;
+    }
+
+    function dateFormat(date) {
+        date = date ? new Date(date) : new Date();
+		return date.getDate().toString().padStart(2,'0')  + '.' + (date.getMonth() + 1).toString().padStart(2,'0') + '.' + date.getFullYear();
+    }
+
+    var Qualification = {
+        '': 'б/р',
+        0: 'б/р',
+        3: 'IIIю',
+        2: 'IIю',
+        1: 'Iю',
+        6: 'III',
+        5: 'II',
+        4: 'I',
+        7: 'КМС',
+        8: 'МС',
+        9: 'МСМК'
+    };
+
+    var STATUS_PRIORITY = [8, 4, 3, 5, 13];
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+</script>
+
+</head>
+<body>
+<div id="content">
+<div class="text-center">
+    <h3> <br>15.12.2024 </h3>
+    <h2>RESULT LIST</h2>
+</div>
+<div id="results-tables"></div>
+
+<style>
+    table.table-split {
+        margin: 0;
+    }
+    table.table-split td{
+        border: 0;
+        padding: 0;
+    }
+</style>
+<script>
+    var race = {"courses": [{"bib": 0, "climb": 0, "controls": [{"code": "39", "length": 0, "object": "CourseControl"}, {"code": "40", "length": 0, "object": "CourseControl"}, {"code": "46", "length": 0, "object": "CourseControl"}, {"code": "45", "length": 0, "object": "CourseControl"}, {"code": "44", "length": 0, "object": "CourseControl"}, {"code": "43", "length": 0, "object": "CourseControl"}, {"code": "38", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "a602d0f4-ba1f-4bea-adea-c70cba22e014", "length": 1300, "name": "D4", "object": "Course"}, {"bib": 0, "climb": 0, "controls": [{"code": "37", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}, {"code": "38", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}, {"code": "40", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "aad988ca-c9c1-4013-9e00-4201a5397b48", "length": 1900, "name": "D3", "object": "Course"}, {"bib": 0, "climb": 0, "controls": [{"code": "38", "length": 0, "object": "CourseControl"}, {"code": "31", "length": 0, "object": "CourseControl"}, {"code": "32", "length": 0, "object": "CourseControl"}, {"code": "34", "length": 0, "object": "CourseControl"}, {"code": "36", "length": 0, "object": "CourseControl"}, {"code": "37", "length": 0, "object": "CourseControl"}, {"code": "40", "length": 0, "object": "CourseControl"}, {"code": "46", "length": 0, "object": "CourseControl"}, {"code": "45", "length": 0, "object": "CourseControl"}, {"code": "44", "length": 0, "object": "CourseControl"}, {"code": "42", "length": 0, "object": "CourseControl"}, {"code": "41", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "ca665ceb-4d98-4cde-a9b2-fc78d1b0128d", "length": 2500, "name": "D2", "object": "Course"}, {"bib": 0, "climb": 0, "controls": [{"code": "36", "length": 0, "object": "CourseControl"}, {"code": "35", "length": 0, "object": "CourseControl"}, {"code": "34", "length": 0, "object": "CourseControl"}, {"code": "31", "length": 0, "object": "CourseControl"}, {"code": "33", "length": 0, "object": "CourseControl"}, {"code": "32", "length": 0, "object": "CourseControl"}, {"code": "40", "length": 0, "object": "CourseControl"}, {"code": "42", "length": 0, "object": "CourseControl"}, {"code": "41", "length": 0, "object": "CourseControl"}, {"code": "43", "length": 0, "object": "CourseControl"}, {"code": "44", "length": 0, "object": "CourseControl"}, {"code": "45", "length": 0, "object": "CourseControl"}, {"code": "46", "length": 0, "object": "CourseControl"}, {"code": "39", "length": 0, "object": "CourseControl"}, {"code": "37", "length": 0, "object": "CourseControl"}, {"code": "38", "length": 0, "object": "CourseControl"}, {"code": "100", "length": 0, "object": "CourseControl"}], "corridor": 0, "id": "303cd8a6-0921-4ac5-8760-51ac5ed31b0f", "length": 3300, "name": "D1", "object": "Course"}], "data": {"chief_referee": "", "description": "", "end_datetime": "2024-12-15 13:00:00", "location": "", "race_type": 0, "relay_leg_count": 3, "secretary": "", "start_datetime": "2024-12-15 11:00:00", "title": "Тренировочный старт", "url": ""}, "groups": [{"__type": null, "count_finished": 9, "count_person": 11, "course_id": "303cd8a6-0921-4ac5-8760-51ac5ed31b0f", "first_number": 0, "id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 0, "min_age": 0, "min_year": 0, "name": "D1", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}, {"__type": null, "count_finished": 7, "count_person": 10, "course_id": "ca665ceb-4d98-4cde-a9b2-fc78d1b0128d", "first_number": 0, "id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 0, "min_age": 0, "min_year": 0, "name": "D2", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}, {"__type": null, "count_finished": 4, "count_person": 5, "course_id": "aad988ca-c9c1-4013-9e00-4201a5397b48", "first_number": 0, "id": "62cd9860-911d-4ae6-a5bf-497c03df3c79", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 0, "min_age": 0, "min_year": 0, "name": "D3", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}, {"__type": null, "count_finished": 3, "count_person": 5, "course_id": "a602d0f4-ba1f-4bea-adea-c70cba22e014", "first_number": 0, "id": "50220ed7-2646-4104-9996-1c68e8484b08", "is_any_course": false, "long_name": "", "max_age": 0, "max_time": 0, "max_year": 0, "min_age": 0, "min_year": 0, "name": "D4", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 0, "start_interval": 0}], "id": "d3d1352e-35e3-400d-bcfc-f1c0d4e25df7", "object": "Race", "organizations": [{"code": "", "contact": "", "count_person": 24, "country": "", "id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "name": "", "object": "Organization", "region": "", "sex": 0}], "persons": [{"bib": 0, "birth_date": null, "card_number": 777784, "comment": "", "group_id": "62cd9860-911d-4ae6-a5bf-497c03df3c79", "id": "c2a2698e-8100-4c8b-ac75-27f2ecdce2af", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Иван", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Доронин", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2070511, "comment": "", "group_id": "50220ed7-2646-4104-9996-1c68e8484b08", "id": "89eba6fe-e0c0-4ef7-8d9f-693f7bc1e943", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Андрей", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Доронин", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4022274, "comment": "", "group_id": "50220ed7-2646-4104-9996-1c68e8484b08", "id": "d671a512-9525-47db-8ecf-e0b53e8034d2", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Серафим", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4022336, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "d7f6684b-07e7-4205-83f8-36856cc06bd2", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Алена", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Мельниченко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "50220ed7-2646-4104-9996-1c68e8484b08", "id": "e9648998-dd19-4fdb-8026-4bf5e377359d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "АНдрей", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Доронин", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4022330, "comment": "", "group_id": "62cd9860-911d-4ae6-a5bf-497c03df3c79", "id": "fda4bbdf-4bc3-47a4-8cd3-07a60d7fa3e0", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Анна", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4022279, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "3ee417ca-4867-416e-92cd-dc6f554cdd34", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Виктор", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Самойлов", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8500697, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "25427264-8edc-4313-9722-2c0714eea762", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Дуня", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Чанчаревич", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8680263, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "ad4838a7-a2e8-4793-b04d-d0740e68add0", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Георгий", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4022443, "comment": "", "group_id": "50220ed7-2646-4104-9996-1c68e8484b08", "id": "ae352ca6-855f-4e51-abc6-7f3999836223", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Анна", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "71df15fd-39a2-47ac-90b5-50ca2cceaa36", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Татьяна", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Молчанова", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "50220ed7-2646-4104-9996-1c68e8484b08", "id": "791dc738-73c9-4e93-8c0f-a414bed00e22", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": true, "name": "Лукьян", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8628696, "comment": "", "group_id": "62cd9860-911d-4ae6-a5bf-497c03df3c79", "id": "5907bbc5-3161-4fef-99b7-74ea6f045be9", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Андрей", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Доронин", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 0, "comment": "", "group_id": "62cd9860-911d-4ae6-a5bf-497c03df3c79", "id": "2faee3c9-db3e-476a-8852-280e299d7aaa", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Серафим", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4022406, "comment": "", "group_id": "62cd9860-911d-4ae6-a5bf-497c03df3c79", "id": "57a5a14b-517b-464b-9f6d-3d18497d6a50", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Степан", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Яценко", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8630815, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "c1cb8755-1d6b-4951-96b7-8ef895cdcf1b", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Сергей", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Доронин", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8110332, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "82500984-17fe-4c85-a45f-3927e88da126", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Драгиш", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Вит", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8870100, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "d5d6bdb2-91c0-47cd-b071-fb3415117f6e", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Игорь", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Сазонов", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2095317, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "23513dc6-4920-44f5-aad1-eeb130ca4afc", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Борис", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Старович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 1413324, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "cc891649-dd7f-468c-a5c3-5df4954286bc", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Соня", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Старович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8500693, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "0d359c2e-e233-4fcb-8b8c-60f77b8480a2", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Ясна", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Старович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 1428804, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "0bc2096e-b70f-46bb-838e-c3f2c72c6153", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Юлия", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Лукашина", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 1312960, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "80e35d0b-455a-4e6c-9e60-918d3bb1bf8d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Ксения", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Нестерова", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2070981, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "8878703d-0612-43c8-9ac9-8055c4f88fd2", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Давор", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Мишич", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8500691, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "79dc6312-e8aa-48a6-bb09-d63f9e14122d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Урош", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Мишич", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8500698, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "e026a1d2-8f19-4a6a-8172-b819380a36b0", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Райна", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Петрович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8090037, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "fcdab8f8-82bd-4143-ae83-b549f80b4628", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Давид", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Петрович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8090031, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "76d77132-950f-41fd-b69e-ffa7eec78c13", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Александар", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Петрович", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 2070987, "comment": "", "group_id": "e1311ac3-ddf5-47e4-a914-836dbe823674", "id": "88537939-d475-439e-9e74-ecd2ac7957bb", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Александра", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Разумная", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 8505224, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "f7412730-1b69-4b12-abe0-e4f2de649784", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Татьяна", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Разумная", "world_code": "", "year": 0}, {"bib": 0, "birth_date": null, "card_number": 4022282, "comment": "", "group_id": "be9a8172-a7f9-4b62-9440-abde5a3da36d", "id": "2412dc4f-ea01-4b45-acd5-6505524b4482", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Василий", "national_code": "0", "object": "Person", "organization_id": "2478b7b4-229e-4632-923a-b30e3d15ff87", "qual": 0, "sex": 0, "start_group": 0, "start_time": 0, "surname": "Амбросимов", "world_code": "", "year": 0}], "results": [{"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022279, "created_at": 1734261227.837745, "credit_time": null, "days": 0, "diff": 2265000, "diff_scores": 0, "final_result_time": null, "finish_msec": 44014007, "finish_time": 44014007, "id": "fe39dbb0-d231-440e-a137-d7863a23b895", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "3ee417ca-4867-416e-92cd-dc6f554cdd34", "place": 6, "result": "00:56:05", "result_current": "00:56:05", "result_current_msec": 3365000, "result_msec": 3365000, "result_relay": "12:13:34", "result_relay_msec": 44014000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "22:26/km", "splits": [{"code": "38", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 4, "leg_time": 64997, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 64997, "speed": "", "time": 40714000}, {"code": "31", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 6, "leg_time": 990000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1054997, "speed": "", "time": 41704000}, {"code": "32", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 5, "leg_time": 207000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1261997, "speed": "", "time": 41911000}, {"code": "34", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 5, "leg_time": 93000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1354997, "speed": "", "time": 42004000}, {"code": "36", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 5, "leg_time": 214000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1568997, "speed": "", "time": 42218000}, {"code": "37", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 6, "leg_time": 228000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1796997, "speed": "", "time": 42446000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 6, "leg_time": 324000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2120997, "speed": "", "time": 42770000}, {"code": "46", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 6, "leg_time": 197000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2317997, "speed": "", "time": 42967000}, {"code": "45", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 6, "leg_time": 137000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2454997, "speed": "", "time": 43104000}, {"code": "44", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 6, "leg_time": 50000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2504997, "speed": "", "time": 43154000}, {"code": "42", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 6, "leg_time": 138000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2642997, "speed": "", "time": 43292000}, {"code": "41", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 6, "leg_time": 241000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2883997, "speed": "", "time": 43533000}, {"code": "39", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 6, "leg_time": 344000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 3227997, "speed": "", "time": 43877000}, {"code": "100", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 6, "leg_time": 118000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 3345997, "speed": "", "time": 43995000}], "start_msec": 40649003, "start_time": 40649003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022274, "created_at": 1734261179.7751038, "credit_time": null, "days": 0, "diff": 487000, "diff_scores": 0, "final_result_time": null, "finish_msec": 43972007, "finish_time": 43972007, "id": "d0d0575c-904f-4194-984b-48b89fa7bcac", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "d671a512-9525-47db-8ecf-e0b53e8034d2", "place": 3, "result": "00:19:41", "result_current": "00:19:41", "result_current_msec": 1181000, "result_msec": 1181000, "result_relay": "12:12:52", "result_relay_msec": 43972000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "15:08/km", "splits": [{"code": "39", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 3, "leg_time": 47997, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 47997, "speed": "", "time": 42839000}, {"code": "40", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 3, "leg_time": 168000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 215997, "speed": "", "time": 43007000}, {"code": "46", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 2, "leg_time": 129000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 344997, "speed": "", "time": 43136000}, {"code": "45", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 3, "leg_time": 270000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 614997, "speed": "", "time": 43406000}, {"code": "44", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 3, "leg_time": 85000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 699997, "speed": "", "time": 43491000}, {"code": "43", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 3, "leg_time": 107000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 806997, "speed": "", "time": 43598000}, {"code": "38", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 3, "leg_time": 328000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1134997, "speed": "", "time": 43926000}, {"code": "100", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 2, "leg_time": 34000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1168997, "speed": "", "time": 43960000}], "start_msec": 42791003, "start_time": 42791003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 1413324, "created_at": 1734260772.9881635, "credit_time": null, "days": 0, "diff": 1810000, "diff_scores": 0, "final_result_time": null, "finish_msec": 43554007, "finish_time": 43554007, "id": "2e9f93a8-54d7-4f85-9306-41cb37c18fb1", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "cc891649-dd7f-468c-a5c3-5df4954286bc", "place": 6, "result": "00:49:17", "result_current": "00:49:17", "result_current_msec": 2957000, "result_msec": 2957000, "result_relay": "12:05:54", "result_relay_msec": 43554000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "14:56/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 5, "leg_time": 108997, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 108997, "speed": "", "time": 40706000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 8, "leg_time": 159000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 267997, "speed": "", "time": 40865000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 6, "leg_time": 73000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 340997, "speed": "", "time": 40938000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 7, "leg_time": 167000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 507997, "speed": "", "time": 41105000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 4, "leg_time": 103000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 610997, "speed": "", "time": 41208000}, {"code": "32", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 4, "leg_time": 26000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 636997, "speed": "", "time": 41234000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 7, "leg_time": 280000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 916997, "speed": "", "time": 41514000}, {"code": "40", "course_index": 0, "days": 0, "index": 7, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 947997, "speed": "", "time": 41545000}, {"code": "42", "course_index": 8, "days": 0, "index": 8, "is_correct": true, "leg_place": 7, "leg_time": 507000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 1423997, "speed": "", "time": 42021000}, {"code": "41", "course_index": 9, "days": 0, "index": 9, "is_correct": true, "leg_place": 7, "leg_time": 117000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 1540997, "speed": "", "time": 42138000}, {"code": "43", "course_index": 10, "days": 0, "index": 10, "is_correct": true, "leg_place": 6, "leg_time": 223000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1763997, "speed": "", "time": 42361000}, {"code": "44", "course_index": 11, "days": 0, "index": 11, "is_correct": true, "leg_place": 6, "leg_time": 426000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2189997, "speed": "", "time": 42787000}, {"code": "45", "course_index": 12, "days": 0, "index": 12, "is_correct": true, "leg_place": 6, "leg_time": 53000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2242997, "speed": "", "time": 42840000}, {"code": "46", "course_index": 13, "days": 0, "index": 13, "is_correct": true, "leg_place": 2, "leg_time": 61000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2303997, "speed": "", "time": 42901000}, {"code": "39", "course_index": 14, "days": 0, "index": 14, "is_correct": true, "leg_place": 5, "leg_time": 223000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2526997, "speed": "", "time": 43124000}, {"code": "37", "course_index": 15, "days": 0, "index": 15, "is_correct": true, "leg_place": 5, "leg_time": 104000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2630997, "speed": "", "time": 43228000}, {"code": "38", "course_index": 16, "days": 0, "index": 16, "is_correct": true, "leg_place": 6, "leg_time": 111000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2741997, "speed": "", "time": 43339000}, {"code": "100", "course_index": 17, "days": 0, "index": 17, "is_correct": true, "leg_place": 6, "leg_time": 200000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 2941997, "speed": "", "time": 43539000}], "start_msec": 40597003, "start_time": 40597003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 2070987, "created_at": 1734260233.1972096, "credit_time": null, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": null, "finish_msec": 43016007, "finish_time": 43016007, "id": "8dd9bc00-f90b-4a97-9628-ead7993657e9", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "88537939-d475-439e-9e74-ecd2ac7957bb", "place": -1, "result": "п.п.3.13.12.2", "result_current": "п.п.3.13.12.2", "result_current_msec": 2845000, "result_msec": 2845000, "result_relay": "п.п.3.13.12.2", "result_relay_msec": 43016000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "18:58/km", "splits": [{"code": "31", "course_index": 0, "days": 0, "index": 0, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 403997, "speed": "", "time": 40575000}, {"code": "32", "course_index": 0, "days": 0, "index": 1, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1728997, "speed": "", "time": 41900000}, {"code": "34", "course_index": 0, "days": 0, "index": 2, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1811997, "speed": "", "time": 41983000}, {"code": "36", "course_index": 0, "days": 0, "index": 3, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1902997, "speed": "", "time": 42074000}, {"code": "37", "course_index": 0, "days": 0, "index": 4, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2032997, "speed": "", "time": 42204000}, {"code": "40", "course_index": 0, "days": 0, "index": 5, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2201997, "speed": "", "time": 42373000}, {"code": "46", "course_index": 0, "days": 0, "index": 6, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2309997, "speed": "", "time": 42481000}, {"code": "45", "course_index": 0, "days": 0, "index": 7, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2391997, "speed": "", "time": 42563000}, {"code": "44", "course_index": 0, "days": 0, "index": 8, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2412997, "speed": "", "time": 42584000}, {"code": "42", "course_index": 0, "days": 0, "index": 9, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2513997, "speed": "", "time": 42685000}, {"code": "41", "course_index": 0, "days": 0, "index": 10, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2607997, "speed": "", "time": 42779000}, {"code": "39", "course_index": 0, "days": 0, "index": 11, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2793997, "speed": "", "time": 42965000}, {"code": "100", "course_index": 0, "days": 0, "index": 12, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 2834997, "speed": "", "time": 43006000}], "start_msec": 40171003, "start_time": 40171003, "status": 4, "status_comment": "п.п.3.13.12.2", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8500698, "created_at": 1734260220.3369129, "credit_time": null, "days": 0, "diff": 1166000, "diff_scores": 0, "final_result_time": null, "finish_msec": 43012007, "finish_time": 43012007, "id": "52a11c9e-909d-426a-a3a0-13c97f882199", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "e026a1d2-8f19-4a6a-8172-b819380a36b0", "place": 5, "result": "00:37:46", "result_current": "00:37:46", "result_current_msec": 2266000, "result_msec": 2266000, "result_relay": "11:56:52", "result_relay_msec": 43012000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "15:06/km", "splits": [{"code": "38", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 3, "leg_time": 32997, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 32997, "speed": "", "time": 40779000}, {"code": "31", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 5, "leg_time": 787000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 819997, "speed": "", "time": 41566000}, {"code": "32", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 1, "leg_time": 84000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 903997, "speed": "", "time": 41650000}, {"code": "34", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 6, "leg_time": 116000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1019997, "speed": "", "time": 41766000}, {"code": "36", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 6, "leg_time": 305000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1324997, "speed": "", "time": 42071000}, {"code": "37", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 4, "leg_time": 132000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1456997, "speed": "", "time": 42203000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 5, "leg_time": 247000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1703997, "speed": "", "time": 42450000}, {"code": "46", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 3, "leg_time": 87000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1790997, "speed": "", "time": 42537000}, {"code": "45", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 1, "leg_time": 51000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1841997, "speed": "", "time": 42588000}, {"code": "44", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 5, "leg_time": 33000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1874997, "speed": "", "time": 42621000}, {"code": "42", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 2, "leg_time": 66000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1940997, "speed": "", "time": 42687000}, {"code": "41", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 3, "leg_time": 91000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 2031997, "speed": "", "time": 42778000}, {"code": "39", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 3, "leg_time": 185000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 2216997, "speed": "", "time": 42963000}, {"code": "100", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 1, "leg_time": 40000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 2256997, "speed": "", "time": 43003000}], "start_msec": 40746003, "start_time": 40746003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 777784, "created_at": 1734260183.183787, "credit_time": null, "days": 0, "diff": 760000, "diff_scores": 0, "final_result_time": null, "finish_msec": 42624007, "finish_time": 42624007, "id": "83c68e77-da90-4f72-94e8-a0dfd938dbf4", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "c2a2698e-8100-4c8b-ac75-27f2ecdce2af", "place": 4, "result": "00:21:41", "result_current": "00:21:41", "result_current_msec": 1301000, "result_msec": 1301000, "result_relay": "11:50:24", "result_relay_msec": 42624000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "11:24/km", "splits": [{"code": "37", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 4, "leg_time": 56997, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 56997, "speed": "", "time": 41380000}, {"code": "100", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 4, "leg_time": 79000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 135997, "speed": "", "time": 41459000}, {"code": "100", "course_index": 0, "days": 0, "index": 2, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 167997, "speed": "", "time": 41491000}, {"code": "100", "course_index": 0, "days": 0, "index": 3, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 177997, "speed": "", "time": 41501000}, {"code": "100", "course_index": 0, "days": 0, "index": 4, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 187997, "speed": "", "time": 41511000}, {"code": "39", "course_index": 3, "days": 0, "index": 5, "is_correct": true, "leg_place": 3, "leg_time": 112000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 247997, "speed": "", "time": 41571000}, {"code": "39", "course_index": 0, "days": 0, "index": 6, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 255997, "speed": "", "time": 41579000}, {"code": "100", "course_index": 4, "days": 0, "index": 7, "is_correct": true, "leg_place": 4, "leg_time": 71000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 318997, "speed": "", "time": 41642000}, {"code": "100", "course_index": 0, "days": 0, "index": 8, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 342997, "speed": "", "time": 41666000}, {"code": "38", "course_index": 5, "days": 0, "index": 9, "is_correct": true, "leg_place": 3, "leg_time": 74000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 392997, "speed": "", "time": 41716000}, {"code": "100", "course_index": 6, "days": 0, "index": 10, "is_correct": true, "leg_place": 4, "leg_time": 47000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 439997, "speed": "", "time": 41763000}, {"code": "100", "course_index": 0, "days": 0, "index": 11, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 540997, "speed": "", "time": 41864000}, {"code": "100", "course_index": 0, "days": 0, "index": 12, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 555997, "speed": "", "time": 41879000}, {"code": "100", "course_index": 0, "days": 0, "index": 13, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 596997, "speed": "", "time": 41920000}, {"code": "100", "course_index": 0, "days": 0, "index": 14, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 657997, "speed": "", "time": 41981000}, {"code": "100", "course_index": 0, "days": 0, "index": 15, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 729997, "speed": "", "time": 42053000}, {"code": "40", "course_index": 7, "days": 0, "index": 16, "is_correct": true, "leg_place": 4, "leg_time": 564000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1003997, "speed": "", "time": 42327000}, {"code": "100", "course_index": 8, "days": 0, "index": 17, "is_correct": true, "leg_place": 4, "leg_time": 271000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1274997, "speed": "", "time": 42598000}], "start_msec": 41323003, "start_time": 41323003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 2070511, "created_at": 1734260086.6768792, "credit_time": null, "days": 0, "diff": 49000, "diff_scores": 0, "final_result_time": null, "finish_msec": 42708007, "finish_time": 42708007, "id": "72a60e16-bc6c-4dee-9390-e03420ae3cee", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "89eba6fe-e0c0-4ef7-8d9f-693f7bc1e943", "place": 2, "result": "00:12:23", "result_current": "00:12:23", "result_current_msec": 743000, "result_msec": 743000, "result_relay": "11:51:48", "result_relay_msec": 42708000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "09:31/km", "splits": [{"code": "39", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 1, "leg_time": 34997, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 34997, "speed": "", "time": 42000000}, {"code": "40", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 1, "leg_time": 139000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 173997, "speed": "", "time": 42139000}, {"code": "46", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 3, "leg_time": 151000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 324997, "speed": "", "time": 42290000}, {"code": "45", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 1, "leg_time": 53000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 377997, "speed": "", "time": 42343000}, {"code": "44", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 1, "leg_time": 25000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 402997, "speed": "", "time": 42368000}, {"code": "43", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 1, "leg_time": 45000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 447997, "speed": "", "time": 42413000}, {"code": "38", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 2, "leg_time": 242000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 689997, "speed": "", "time": 42655000}, {"code": "100", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 3, "leg_time": 45000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 734997, "speed": "", "time": 42700000}], "start_msec": 41965003, "start_time": 41965003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022330, "created_at": 1734259765.7631848, "credit_time": null, "days": 0, "diff": 0, "diff_scores": 0, "final_result_time": null, "finish_msec": 42552007, "finish_time": 42552007, "id": "8ee52b6f-4f3d-450e-8a40-bfc26585d38a", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "fda4bbdf-4bc3-47a4-8cd3-07a60d7fa3e0", "place": 1, "result": "00:09:01", "result_current": "00:09:01", "result_current_msec": 541000, "result_msec": 541000, "result_relay": "11:49:12", "result_relay_msec": 42552000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "04:44/km", "splits": [{"code": "37", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 3, "leg_time": 38997, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 38997, "speed": "", "time": 42050000}, {"code": "100", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 2, "leg_time": 42000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 80997, "speed": "", "time": 42092000}, {"code": "39", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 1, "leg_time": 50000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 130997, "speed": "", "time": 42142000}, {"code": "100", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 2, "leg_time": 45000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 175997, "speed": "", "time": 42187000}, {"code": "38", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 1, "leg_time": 46000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 221997, "speed": "", "time": 42233000}, {"code": "100", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 1, "leg_time": 28000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 249997, "speed": "", "time": 42261000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 1, "leg_time": 150000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 399997, "speed": "", "time": 42411000}, {"code": "100", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 2, "leg_time": 130000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 529997, "speed": "", "time": 42541000}], "start_msec": 42011003, "start_time": 42011003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8630815, "created_at": 1734259638.9711144, "credit_time": null, "days": 0, "diff": 326000, "diff_scores": 0, "final_result_time": null, "finish_msec": 42420007, "finish_time": 42420007, "id": "843ab067-fa57-4919-ab5f-751f43f73f2c", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "c1cb8755-1d6b-4951-96b7-8ef895cdcf1b", "place": 2, "result": "00:24:33", "result_current": "00:24:33", "result_current_msec": 1473000, "result_msec": 1473000, "result_relay": "11:47:00", "result_relay_msec": 42420000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "07:26/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 1, "leg_time": 76997, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 76997, "speed": "", "time": 41024000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 2, "leg_time": 28000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 104997, "speed": "", "time": 41052000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 8, "leg_time": 93000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 197997, "speed": "", "time": 41145000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 2, "leg_time": 84000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 281997, "speed": "", "time": 41229000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 7, "leg_time": 251000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 532997, "speed": "", "time": 41480000}, {"code": "32", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 2, "leg_time": 22000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 554997, "speed": "", "time": 41502000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 2, "leg_time": 130000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 684997, "speed": "", "time": 41632000}, {"code": "42", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 4, "leg_time": 124000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 808997, "speed": "", "time": 41756000}, {"code": "41", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 2, "leg_time": 74000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 882997, "speed": "", "time": 41830000}, {"code": "43", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 3, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 949997, "speed": "", "time": 41897000}, {"code": "44", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 2, "leg_time": 48000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 997997, "speed": "", "time": 41945000}, {"code": "45", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 4, "leg_time": 36000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1033997, "speed": "", "time": 41981000}, {"code": "45", "course_index": 0, "days": 0, "index": 12, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1034997, "speed": "", "time": 41982000}, {"code": "46", "course_index": 13, "days": 0, "index": 13, "is_correct": true, "leg_place": 6, "leg_time": 75000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1108997, "speed": "", "time": 42056000}, {"code": "39", "course_index": 14, "days": 0, "index": 14, "is_correct": true, "leg_place": 3, "leg_time": 166000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1274997, "speed": "", "time": 42222000}, {"code": "39", "course_index": 0, "days": 0, "index": 15, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1275997, "speed": "", "time": 42223000}, {"code": "37", "course_index": 15, "days": 0, "index": 16, "is_correct": true, "leg_place": 3, "leg_time": 78000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1352997, "speed": "", "time": 42300000}, {"code": "38", "course_index": 16, "days": 0, "index": 17, "is_correct": true, "leg_place": 1, "leg_time": 64000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1416997, "speed": "", "time": 42364000}, {"code": "100", "course_index": 17, "days": 0, "index": 18, "is_correct": true, "leg_place": 5, "leg_time": 42000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1458997, "speed": "", "time": 42406000}], "start_msec": 40947003, "start_time": 40947003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 1428804, "created_at": 1734259626.6797028, "credit_time": null, "days": 0, "diff": 631000, "diff_scores": 0, "final_result_time": null, "finish_msec": 42414007, "finish_time": 42414007, "id": "c39d204b-051b-4361-b0ae-3614b132a6da", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "0bc2096e-b70f-46bb-838e-c3f2c72c6153", "place": 4, "result": "00:29:38", "result_current": "00:29:38", "result_current_msec": 1778000, "result_msec": 1778000, "result_relay": "11:46:54", "result_relay_msec": 42414000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "08:58/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 7, "leg_time": 191997, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 191997, "speed": "", "time": 40828000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 7, "leg_time": 83000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 274997, "speed": "", "time": 40911000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 3, "leg_time": 59000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 333997, "speed": "", "time": 40970000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 8, "leg_time": 256000, "length_leg": 0, "object": "Split", "relative_place": 8, "relative_time": 589997, "speed": "", "time": 41226000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 6, "leg_time": 243000, "length_leg": 0, "object": "Split", "relative_place": 8, "relative_time": 832997, "speed": "", "time": 41469000}, {"code": "32", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 3, "leg_time": 25000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 857997, "speed": "", "time": 41494000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 3, "leg_time": 131000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 988997, "speed": "", "time": 41625000}, {"code": "42", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 2, "leg_time": 114000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1102997, "speed": "", "time": 41739000}, {"code": "41", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 3, "leg_time": 87000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 1189997, "speed": "", "time": 41826000}, {"code": "43", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 3, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1256997, "speed": "", "time": 41893000}, {"code": "44", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 4, "leg_time": 55000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1311997, "speed": "", "time": 41948000}, {"code": "45", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 1, "leg_time": 25000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1336997, "speed": "", "time": 41973000}, {"code": "46", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 5, "leg_time": 72000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1408997, "speed": "", "time": 42045000}, {"code": "39", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 4, "leg_time": 182000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1590997, "speed": "", "time": 42227000}, {"code": "37", "course_index": 15, "days": 0, "index": 14, "is_correct": true, "leg_place": 2, "leg_time": 74000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1664997, "speed": "", "time": 42301000}, {"code": "38", "course_index": 16, "days": 0, "index": 15, "is_correct": true, "leg_place": 3, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1731997, "speed": "", "time": 42368000}, {"code": "100", "course_index": 17, "days": 0, "index": 16, "is_correct": true, "leg_place": 2, "leg_time": 36000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1767997, "speed": "", "time": 42404000}], "start_msec": 40636003, "start_time": 40636003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8500697, "created_at": 1734259607.1659834, "credit_time": null, "days": 0, "diff": 497000, "diff_scores": 0, "final_result_time": null, "finish_msec": 42392007, "finish_time": 42392007, "id": "19c7f4ed-140e-4bd3-b558-84ec1bcbd6be", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "25427264-8edc-4313-9722-2c0714eea762", "place": 3, "result": "00:27:24", "result_current": "00:27:24", "result_current_msec": 1644000, "result_msec": 1644000, "result_relay": "11:46:32", "result_relay_msec": 42392000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "08:18/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 1, "leg_time": 76997, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 76997, "speed": "", "time": 40825000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 4, "leg_time": 36000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 112997, "speed": "", "time": 40861000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 5, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 179997, "speed": "", "time": 40928000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 5, "leg_time": 101000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 280997, "speed": "", "time": 41029000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 8, "leg_time": 442000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 722997, "speed": "", "time": 41471000}, {"code": "32", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 1, "leg_time": 19000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 741997, "speed": "", "time": 41490000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 4, "leg_time": 134000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 875997, "speed": "", "time": 41624000}, {"code": "42", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 3, "leg_time": 121000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 996997, "speed": "", "time": 41745000}, {"code": "41", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 4, "leg_time": 89000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1085997, "speed": "", "time": 41834000}, {"code": "43", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 2, "leg_time": 58000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1143997, "speed": "", "time": 41892000}, {"code": "44", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 4, "leg_time": 55000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1198997, "speed": "", "time": 41947000}, {"code": "45", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 2, "leg_time": 32000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1230997, "speed": "", "time": 41979000}, {"code": "46", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 4, "leg_time": 64000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1294997, "speed": "", "time": 42043000}, {"code": "39", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 2, "leg_time": 156000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1450997, "speed": "", "time": 42199000}, {"code": "37", "course_index": 15, "days": 0, "index": 14, "is_correct": true, "leg_place": 4, "leg_time": 80000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1530997, "speed": "", "time": 42279000}, {"code": "38", "course_index": 16, "days": 0, "index": 15, "is_correct": true, "leg_place": 3, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1597997, "speed": "", "time": 42346000}, {"code": "100", "course_index": 17, "days": 0, "index": 16, "is_correct": true, "leg_place": 3, "leg_time": 37000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1634997, "speed": "", "time": 42383000}], "start_msec": 40748003, "start_time": 40748003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022282, "created_at": 1734259567.2150161, "credit_time": null, "days": 0, "diff": 650000, "diff_scores": 0, "final_result_time": null, "finish_msec": 42116007, "finish_time": 42116007, "id": "2c6d78ec-656e-4fad-a43c-11c9b93898b2", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "2412dc4f-ea01-4b45-acd5-6505524b4482", "place": 5, "result": "00:29:57", "result_current": "00:29:57", "result_current_msec": 1797000, "result_msec": 1797000, "result_relay": "11:41:56", "result_relay_msec": 42116000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "09:04/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 8, "leg_time": 265997, "length_leg": 0, "object": "Split", "relative_place": 8, "relative_time": 265997, "speed": "", "time": 40585000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 6, "leg_time": 58000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 323997, "speed": "", "time": 40643000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 4, "leg_time": 65000, "length_leg": 0, "object": "Split", "relative_place": 8, "relative_time": 388997, "speed": "", "time": 40708000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 6, "leg_time": 102000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 490997, "speed": "", "time": 40810000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 5, "leg_time": 132000, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 622997, "speed": "", "time": 40942000}, {"code": "32", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 4, "leg_time": 26000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 648997, "speed": "", "time": 40968000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 6, "leg_time": 146000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 794997, "speed": "", "time": 41114000}, {"code": "42", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 5, "leg_time": 129000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 923997, "speed": "", "time": 41243000}, {"code": "41", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 5, "leg_time": 92000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1015997, "speed": "", "time": 41335000}, {"code": "43", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 5, "leg_time": 80000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1095997, "speed": "", "time": 41415000}, {"code": "44", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 3, "leg_time": 54000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1149997, "speed": "", "time": 41469000}, {"code": "45", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 3, "leg_time": 33000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1182997, "speed": "", "time": 41502000}, {"code": "46", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 3, "leg_time": 62000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1244997, "speed": "", "time": 41564000}, {"code": "39", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 6, "leg_time": 230000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1474997, "speed": "", "time": 41794000}, {"code": "37", "course_index": 15, "days": 0, "index": 14, "is_correct": true, "leg_place": 6, "leg_time": 199000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1673997, "speed": "", "time": 41993000}, {"code": "38", "course_index": 16, "days": 0, "index": 15, "is_correct": true, "leg_place": 5, "leg_time": 75000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1748997, "speed": "", "time": 42068000}, {"code": "100", "course_index": 17, "days": 0, "index": 16, "is_correct": true, "leg_place": 3, "leg_time": 37000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 1785997, "speed": "", "time": 42105000}], "start_msec": 40319003, "start_time": 40319003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8500691, "created_at": 1734259495.1154325, "credit_time": null, "days": 0, "diff": 339000, "diff_scores": 0, "final_result_time": null, "finish_msec": 42272007, "finish_time": 42272007, "id": "47cf0ee1-dcc9-4ed9-8dfb-7407b33b867f", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "79dc6312-e8aa-48a6-bb09-d63f9e14122d", "place": 2, "result": "00:23:59", "result_current": "00:23:59", "result_current_msec": 1439000, "result_msec": 1439000, "result_relay": "11:44:32", "result_relay_msec": 42272000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "09:35/km", "splits": [{"code": "38", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 1, "leg_time": 28997, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 28997, "speed": "", "time": 40862000}, {"code": "31", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 3, "leg_time": 172000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 200997, "speed": "", "time": 41034000}, {"code": "32", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 4, "leg_time": 118000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 318997, "speed": "", "time": 41152000}, {"code": "34", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 3, "leg_time": 61000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 379997, "speed": "", "time": 41213000}, {"code": "36", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 4, "leg_time": 182000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 561997, "speed": "", "time": 41395000}, {"code": "37", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 2, "leg_time": 100000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 661997, "speed": "", "time": 41495000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 2, "leg_time": 150000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 811997, "speed": "", "time": 41645000}, {"code": "46", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 2, "leg_time": 85000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 896997, "speed": "", "time": 41730000}, {"code": "45", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 4, "leg_time": 89000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 985997, "speed": "", "time": 41819000}, {"code": "44", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 3, "leg_time": 27000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1012997, "speed": "", "time": 41846000}, {"code": "42", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 1, "leg_time": 61000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1073997, "speed": "", "time": 41907000}, {"code": "41", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 5, "leg_time": 122000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1195997, "speed": "", "time": 42029000}, {"code": "39", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 2, "leg_time": 165000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1360997, "speed": "", "time": 42194000}, {"code": "100", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 5, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 1427997, "speed": "", "time": 42261000}], "start_msec": 40833003, "start_time": 40833003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8500693, "created_at": 1734259360.1393704, "credit_time": null, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": null, "finish_msec": 42143007, "finish_time": 42143007, "id": "dcdf29f0-ef3a-4135-9c6f-407f67195f1c", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "0d359c2e-e233-4fcb-8b8c-60f77b8480a2", "place": -1, "result": "п.п.3.13.12.2", "result_current": "п.п.3.13.12.2", "result_current_msec": 1659000, "result_msec": 1659000, "result_relay": "п.п.3.13.12.2", "result_relay_msec": 42143000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "08:22/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 4, "leg_time": 105997, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 105997, "speed": "", "time": 40590000}, {"code": "34", "course_index": 0, "days": 0, "index": 1, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 219997, "speed": "", "time": 40704000}, {"code": "31", "course_index": 0, "days": 0, "index": 2, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 308997, "speed": "", "time": 40793000}, {"code": "33", "course_index": 0, "days": 0, "index": 3, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 388997, "speed": "", "time": 40873000}, {"code": "32", "course_index": 0, "days": 0, "index": 4, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 415997, "speed": "", "time": 40900000}, {"code": "40", "course_index": 0, "days": 0, "index": 5, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 534997, "speed": "", "time": 41019000}, {"code": "42", "course_index": 0, "days": 0, "index": 6, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 639997, "speed": "", "time": 41124000}, {"code": "41", "course_index": 0, "days": 0, "index": 7, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 691997, "speed": "", "time": 41176000}, {"code": "43", "course_index": 0, "days": 0, "index": 8, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 748997, "speed": "", "time": 41233000}, {"code": "44", "course_index": 0, "days": 0, "index": 9, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 794997, "speed": "", "time": 41279000}, {"code": "45", "course_index": 0, "days": 0, "index": 10, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 820997, "speed": "", "time": 41305000}, {"code": "46", "course_index": 0, "days": 0, "index": 11, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 904997, "speed": "", "time": 41389000}, {"code": "39", "course_index": 0, "days": 0, "index": 12, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1331997, "speed": "", "time": 41816000}, {"code": "37", "course_index": 0, "days": 0, "index": 13, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1453997, "speed": "", "time": 41938000}, {"code": "38", "course_index": 0, "days": 0, "index": 14, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1625997, "speed": "", "time": 42110000}, {"code": "100", "course_index": 0, "days": 0, "index": 15, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1648997, "speed": "", "time": 42133000}], "start_msec": 40484003, "start_time": 40484003, "status": 4, "status_comment": "п.п.3.13.12.2", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8090037, "created_at": 1734259355.0596354, "credit_time": null, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": null, "finish_msec": 42105007, "finish_time": 42105007, "id": "d5cf7afc-fe11-4074-9b3a-4743cf4f02f5", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "fcdab8f8-82bd-4143-ae83-b549f80b4628", "place": -1, "result": "п.п.3.13.12.2", "result_current": "п.п.3.13.12.2", "result_current_msec": 1797000, "result_msec": 1797000, "result_relay": "п.п.3.13.12.2", "result_relay_msec": 42105000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "09:04/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 9, "leg_time": 301997, "length_leg": 0, "object": "Split", "relative_place": 9, "relative_time": 301997, "speed": "", "time": 40610000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 2, "leg_time": 28000, "length_leg": 0, "object": "Split", "relative_place": 8, "relative_time": 329997, "speed": "", "time": 40638000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 1, "leg_time": 49000, "length_leg": 0, "object": "Split", "relative_place": 7, "relative_time": 378997, "speed": "", "time": 40687000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 1, "leg_time": 69000, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 447997, "speed": "", "time": 40756000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 2, "leg_time": 92000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 539997, "speed": "", "time": 40848000}, {"code": "40", "course_index": 0, "days": 0, "index": 5, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 686997, "speed": "", "time": 40995000}, {"code": "42", "course_index": 0, "days": 0, "index": 6, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 791997, "speed": "", "time": 41100000}, {"code": "41", "course_index": 0, "days": 0, "index": 7, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 850997, "speed": "", "time": 41159000}, {"code": "43", "course_index": 0, "days": 0, "index": 8, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 905997, "speed": "", "time": 41214000}, {"code": "44", "course_index": 0, "days": 0, "index": 9, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 951997, "speed": "", "time": 41260000}, {"code": "45", "course_index": 0, "days": 0, "index": 10, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1013997, "speed": "", "time": 41322000}, {"code": "46", "course_index": 0, "days": 0, "index": 11, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1073997, "speed": "", "time": 41382000}, {"code": "46", "course_index": 0, "days": 0, "index": 12, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1448997, "speed": "", "time": 41757000}, {"code": "39", "course_index": 0, "days": 0, "index": 13, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1606997, "speed": "", "time": 41915000}, {"code": "37", "course_index": 0, "days": 0, "index": 14, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1675997, "speed": "", "time": 41984000}, {"code": "38", "course_index": 0, "days": 0, "index": 15, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1745997, "speed": "", "time": 42054000}, {"code": "100", "course_index": 0, "days": 0, "index": 16, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1775997, "speed": "", "time": 42084000}], "start_msec": 40308003, "start_time": 40308003, "status": 4, "status_comment": "п.п.3.13.12.2", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022336, "created_at": 1734259346.855666, "credit_time": null, "days": 0, "diff": 532000, "diff_scores": 0, "final_result_time": null, "finish_msec": 41962007, "finish_time": 41962007, "id": "b8d0f17a-c78d-4ca7-b8e0-32612f249793", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "d7f6684b-07e7-4205-83f8-36856cc06bd2", "place": 4, "result": "00:27:12", "result_current": "00:27:12", "result_current_msec": 1632000, "result_msec": 1632000, "result_relay": "11:39:22", "result_relay_msec": 41962000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "10:52/km", "splits": [{"code": "39", "course_index": 0, "days": 0, "index": 0, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 217997, "speed": "", "time": 40548000}, {"code": "38", "course_index": 1, "days": 0, "index": 1, "is_correct": true, "leg_place": 6, "leg_time": 322997, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 322997, "speed": "", "time": 40653000}, {"code": "31", "course_index": 2, "days": 0, "index": 2, "is_correct": true, "leg_place": 1, "leg_time": 74000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 396997, "speed": "", "time": 40727000}, {"code": "32", "course_index": 3, "days": 0, "index": 3, "is_correct": true, "leg_place": 2, "leg_time": 88000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 484997, "speed": "", "time": 40815000}, {"code": "34", "course_index": 4, "days": 0, "index": 4, "is_correct": true, "leg_place": 1, "leg_time": 51000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 535997, "speed": "", "time": 40866000}, {"code": "36", "course_index": 5, "days": 0, "index": 5, "is_correct": true, "leg_place": 2, "leg_time": 70000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 605997, "speed": "", "time": 40936000}, {"code": "37", "course_index": 6, "days": 0, "index": 6, "is_correct": true, "leg_place": 5, "leg_time": 145000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 750997, "speed": "", "time": 41081000}, {"code": "40", "course_index": 7, "days": 0, "index": 7, "is_correct": true, "leg_place": 4, "leg_time": 200000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 950997, "speed": "", "time": 41281000}, {"code": "46", "course_index": 8, "days": 0, "index": 8, "is_correct": true, "leg_place": 4, "leg_time": 103000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1053997, "speed": "", "time": 41384000}, {"code": "45", "course_index": 9, "days": 0, "index": 9, "is_correct": true, "leg_place": 2, "leg_time": 71000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1124997, "speed": "", "time": 41455000}, {"code": "44", "course_index": 10, "days": 0, "index": 10, "is_correct": true, "leg_place": 4, "leg_time": 29000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1153997, "speed": "", "time": 41484000}, {"code": "42", "course_index": 11, "days": 0, "index": 11, "is_correct": true, "leg_place": 5, "leg_time": 69000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1222997, "speed": "", "time": 41553000}, {"code": "41", "course_index": 12, "days": 0, "index": 12, "is_correct": true, "leg_place": 3, "leg_time": 91000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1313997, "speed": "", "time": 41644000}, {"code": "39", "course_index": 13, "days": 0, "index": 13, "is_correct": true, "leg_place": 5, "leg_time": 252000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1565997, "speed": "", "time": 41896000}, {"code": "100", "course_index": 14, "days": 0, "index": 14, "is_correct": true, "leg_place": 4, "leg_time": 56000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1621997, "speed": "", "time": 41952000}], "start_msec": 40330003, "start_time": 40330003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 1312960, "created_at": 1734259110.8116062, "credit_time": null, "days": 0, "diff": 530000, "diff_scores": 0, "final_result_time": null, "finish_msec": 41860007, "finish_time": 41860007, "id": "b7b0ba42-15b3-4aa2-a35f-b7d77f298e73", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "80e35d0b-455a-4e6c-9e60-918d3bb1bf8d", "place": 3, "result": "00:27:10", "result_current": "00:27:10", "result_current_msec": 1630000, "result_msec": 1630000, "result_relay": "11:37:40", "result_relay_msec": 41860000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "10:52/km", "splits": [{"code": "38", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 5, "leg_time": 75997, "length_leg": 0, "object": "Split", "relative_place": 5, "relative_time": 75997, "speed": "", "time": 40306000}, {"code": "31", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 4, "leg_time": 197000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 272997, "speed": "", "time": 40503000}, {"code": "32", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 6, "leg_time": 269000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 541997, "speed": "", "time": 40772000}, {"code": "34", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 4, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 608997, "speed": "", "time": 40839000}, {"code": "36", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 3, "leg_time": 100000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 708997, "speed": "", "time": 40939000}, {"code": "37", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 3, "leg_time": 129000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 837997, "speed": "", "time": 41068000}, {"code": "37", "course_index": 0, "days": 0, "index": 6, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 852997, "speed": "", "time": 41083000}, {"code": "40", "course_index": 7, "days": 0, "index": 7, "is_correct": true, "leg_place": 3, "leg_time": 175000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1012997, "speed": "", "time": 41243000}, {"code": "40", "course_index": 0, "days": 0, "index": 8, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1047997, "speed": "", "time": 41278000}, {"code": "46", "course_index": 8, "days": 0, "index": 9, "is_correct": true, "leg_place": 5, "leg_time": 113000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1125997, "speed": "", "time": 41356000}, {"code": "45", "course_index": 9, "days": 0, "index": 10, "is_correct": true, "leg_place": 5, "leg_time": 101000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1226997, "speed": "", "time": 41457000}, {"code": "44", "course_index": 10, "days": 0, "index": 11, "is_correct": true, "leg_place": 1, "leg_time": 19000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1245997, "speed": "", "time": 41476000}, {"code": "42", "course_index": 11, "days": 0, "index": 12, "is_correct": true, "leg_place": 3, "leg_time": 67000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1312997, "speed": "", "time": 41543000}, {"code": "41", "course_index": 12, "days": 0, "index": 13, "is_correct": true, "leg_place": 2, "leg_time": 73000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1385997, "speed": "", "time": 41616000}, {"code": "39", "course_index": 13, "days": 0, "index": 14, "is_correct": true, "leg_place": 4, "leg_time": 187000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 1572997, "speed": "", "time": 41803000}, {"code": "100", "course_index": 14, "days": 0, "index": 15, "is_correct": true, "leg_place": 3, "leg_time": 44000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 1616997, "speed": "", "time": 41847000}], "start_msec": 40230003, "start_time": 40230003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022281, "created_at": 1734259072.8368118, "credit_time": 0, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": null, "finish_msec": 41859007, "finish_time": 41859007, "id": "125ffaa8-bcfc-4372-88c5-bb188ab6fa7a", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": 0, "person_id": null, "place": -1, "result": "п.п.3.13.12.2", "result_current": "п.п.3.13.12.2", "result_current_msec": 907000, "result_msec": 907000, "result_relay": "п.п.3.13.12.2", "result_relay_msec": 41859000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "07:57/km", "splits": [{"code": "37", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 40978000}, {"code": "100", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 41012000}, {"code": "39", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 41098000}, {"code": "100", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 41141000}, {"code": "38", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 41372000}, {"code": "40", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 41699000}, {"code": "100", "course_index": 0, "days": 0, "index": 0, "is_correct": true, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 0, "speed": "", "time": 41850000}], "start_msec": 40952003, "start_time": 40952003, "status": 4, "status_comment": "п.п.3.13.12.2", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8505224, "created_at": 1734259018.7500489, "credit_time": null, "days": 0, "diff": null, "diff_scores": 0, "final_result_time": null, "finish_msec": 41782007, "finish_time": 41782007, "id": "f8adbcac-8513-46c2-9e16-eb874e50d147", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "f7412730-1b69-4b12-abe0-e4f2de649784", "place": -1, "result": "п.п.3.13.12.2", "result_current": "п.п.3.13.12.2", "result_current_msec": 1568000, "result_msec": 1568000, "result_relay": "п.п.3.13.12.2", "result_relay_msec": 41782000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "07:55/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 6, "leg_time": 120997, "length_leg": 0, "object": "Split", "relative_place": 6, "relative_time": 120997, "speed": "", "time": 40335000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 5, "leg_time": 48000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 168997, "speed": "", "time": 40383000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 7, "leg_time": 80000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 248997, "speed": "", "time": 40463000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 4, "leg_time": 90000, "length_leg": 0, "object": "Split", "relative_place": 4, "relative_time": 338997, "speed": "", "time": 40553000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 3, "leg_time": 101000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 439997, "speed": "", "time": 40654000}, {"code": "32", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 7, "leg_time": 33000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 472997, "speed": "", "time": 40687000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 5, "leg_time": 144000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 616997, "speed": "", "time": 40831000}, {"code": "42", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 6, "leg_time": 137000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 753997, "speed": "", "time": 40968000}, {"code": "41", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 6, "leg_time": 108000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 861997, "speed": "", "time": 41076000}, {"code": "39", "course_index": 0, "days": 0, "index": 9, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1009997, "speed": "", "time": 41224000}, {"code": "100", "course_index": 0, "days": 0, "index": 10, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1059997, "speed": "", "time": 41274000}, {"code": "37", "course_index": 0, "days": 0, "index": 11, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1217997, "speed": "", "time": 41432000}, {"code": "37", "course_index": 0, "days": 0, "index": 12, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1442997, "speed": "", "time": 41657000}, {"code": "38", "course_index": 0, "days": 0, "index": 13, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1527997, "speed": "", "time": 41742000}, {"code": "100", "course_index": 0, "days": 0, "index": 14, "is_correct": false, "leg_place": 0, "leg_time": 0, "length_leg": 0, "object": "Split", "relative_place": 0, "relative_time": 1556997, "speed": "", "time": 41771000}], "start_msec": 40214003, "start_time": 40214003, "status": 4, "status_comment": "п.п.3.13.12.2", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8628696, "created_at": 1734259001.808488, "credit_time": null, "days": 0, "diff": 139000, "diff_scores": 0, "final_result_time": null, "finish_msec": 41791007, "finish_time": 41791007, "id": "d1d9993d-0844-4638-a10f-ad6b70f90ea2", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "5907bbc5-3161-4fef-99b7-74ea6f045be9", "place": 2, "result": "00:11:20", "result_current": "00:11:20", "result_current_msec": 680000, "result_msec": 680000, "result_relay": "11:36:31", "result_relay_msec": 41791000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "05:57/km", "splits": [{"code": "37", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 1, "leg_time": 22997, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 22997, "speed": "", "time": 41134000}, {"code": "100", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 1, "leg_time": 39000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 61997, "speed": "", "time": 41173000}, {"code": "39", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 4, "leg_time": 119000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 180997, "speed": "", "time": 41292000}, {"code": "100", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 3, "leg_time": 49000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 229997, "speed": "", "time": 41341000}, {"code": "38", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 2, "leg_time": 52000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 281997, "speed": "", "time": 41393000}, {"code": "100", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 2, "leg_time": 30000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 311997, "speed": "", "time": 41423000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 2, "leg_time": 207000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 518997, "speed": "", "time": 41630000}, {"code": "100", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 3, "leg_time": 151000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 669997, "speed": "", "time": 41781000}], "start_msec": 41111003, "start_time": 41111003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022406, "created_at": 1734258981.3974695, "credit_time": null, "days": 0, "diff": 177000, "diff_scores": 0, "final_result_time": null, "finish_msec": 41681007, "finish_time": 41681007, "id": "7275e9d3-111d-48b6-b589-9e7ae4bc7350", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "57a5a14b-517b-464b-9f6d-3d18497d6a50", "place": 3, "result": "00:11:58", "result_current": "00:11:58", "result_current_msec": 718000, "result_msec": 718000, "result_relay": "11:34:41", "result_relay_msec": 41681000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "06:17/km", "splits": [{"code": "37", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 2, "leg_time": 27997, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 27997, "speed": "", "time": 40991000}, {"code": "100", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 3, "leg_time": 45000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 72997, "speed": "", "time": 41036000}, {"code": "39", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 2, "leg_time": 72000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 144997, "speed": "", "time": 41108000}, {"code": "100", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 1, "leg_time": 28000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 172997, "speed": "", "time": 41136000}, {"code": "38", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 4, "leg_time": 81000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 253997, "speed": "", "time": 41217000}, {"code": "100", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 3, "leg_time": 36000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 289997, "speed": "", "time": 41253000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 3, "leg_time": 297000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 586997, "speed": "", "time": 41550000}, {"code": "100", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 1, "leg_time": 119000, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 705997, "speed": "", "time": 41669000}], "start_msec": 40963003, "start_time": 40963003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 4022443, "created_at": 1734258973.9144971, "credit_time": null, "days": 0, "diff": 0, "diff_scores": 0, "final_result_time": null, "finish_msec": 41642007, "finish_time": 41642007, "id": "a2d79715-3597-41dc-ae7d-6cd28d31d15d", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "ae352ca6-855f-4e51-abc6-7f3999836223", "place": 1, "result": "00:11:34", "result_current": "00:11:34", "result_current_msec": 694000, "result_msec": 694000, "result_relay": "11:34:02", "result_relay_msec": 41642000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "08:53/km", "splits": [{"code": "39", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 2, "leg_time": 35997, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 35997, "speed": "", "time": 40984000}, {"code": "40", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 2, "leg_time": 144000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 179997, "speed": "", "time": 41128000}, {"code": "46", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 1, "leg_time": 96000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 275997, "speed": "", "time": 41224000}, {"code": "45", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 2, "leg_time": 108000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 383997, "speed": "", "time": 41332000}, {"code": "44", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 2, "leg_time": 27000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 410997, "speed": "", "time": 41359000}, {"code": "43", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 2, "leg_time": 54000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 464997, "speed": "", "time": 41413000}, {"code": "38", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 1, "leg_time": 188000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 652997, "speed": "", "time": 41601000}, {"code": "100", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 1, "leg_time": 29000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 681997, "speed": "", "time": 41630000}], "start_msec": 40948003, "start_time": 40948003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 8090031, "created_at": 1734258963.9123118, "credit_time": null, "days": 0, "diff": 0, "diff_scores": 0, "final_result_time": null, "finish_msec": 41742007, "finish_time": 41742007, "id": "bcbe2645-7e98-4420-97e9-9d1cf5d1af56", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "76d77132-950f-41fd-b69e-ffa7eec78c13", "place": 1, "result": "00:19:07", "result_current": "00:19:07", "result_current_msec": 1147000, "result_msec": 1147000, "result_relay": "11:35:42", "result_relay_msec": 41742000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "05:47/km", "splits": [{"code": "36", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 3, "leg_time": 84997, "length_leg": 0, "object": "Split", "relative_place": 3, "relative_time": 84997, "speed": "", "time": 40680000}, {"code": "35", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 1, "leg_time": 25000, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 109997, "speed": "", "time": 40705000}, {"code": "34", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 2, "leg_time": 57000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 166997, "speed": "", "time": 40762000}, {"code": "31", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 3, "leg_time": 87000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 253997, "speed": "", "time": 40849000}, {"code": "33", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 1, "leg_time": 88000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 341997, "speed": "", "time": 40937000}, {"code": "32", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 6, "leg_time": 27000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 368997, "speed": "", "time": 40964000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 1, "leg_time": 119000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 487997, "speed": "", "time": 41083000}, {"code": "42", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 1, "leg_time": 100000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 587997, "speed": "", "time": 41183000}, {"code": "41", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 1, "leg_time": 69000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 656997, "speed": "", "time": 41252000}, {"code": "43", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 1, "leg_time": 49000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 705997, "speed": "", "time": 41301000}, {"code": "44", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 1, "leg_time": 43000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 748997, "speed": "", "time": 41344000}, {"code": "45", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 5, "leg_time": 38000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 786997, "speed": "", "time": 41382000}, {"code": "46", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 1, "leg_time": 55000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 841997, "speed": "", "time": 41437000}, {"code": "39", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 1, "leg_time": 136000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 977997, "speed": "", "time": 41573000}, {"code": "37", "course_index": 15, "days": 0, "index": 14, "is_correct": true, "leg_place": 1, "leg_time": 65000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 1042997, "speed": "", "time": 41638000}, {"code": "38", "course_index": 16, "days": 0, "index": 15, "is_correct": true, "leg_place": 2, "leg_time": 65000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 1107997, "speed": "", "time": 41703000}, {"code": "100", "course_index": 17, "days": 0, "index": 16, "is_correct": true, "leg_place": 1, "leg_time": 31000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 1138997, "speed": "", "time": 41734000}], "start_msec": 40595003, "start_time": 40595003, "status": 1, "status_comment": "", "system_type": 2}, {"assigned_rank": 0, "bib": 0, "can_win_count": 0, "card_number": 2070981, "created_at": 1734258957.9009585, "credit_time": null, "days": 0, "diff": 0, "diff_scores": 0, "final_result_time": null, "finish_msec": 41651007, "finish_time": 41651007, "id": "8cc7956e-3830-4c55-b279-af7d3853a931", "multi_day_results": "", "object": "ResultSportident", "order": 0, "penalty_laps": 0, "penalty_time": null, "person_id": "8878703d-0612-43c8-9ac9-8055c4f88fd2", "place": 1, "result": "00:18:20", "result_current": "00:18:20", "result_current_msec": 1100000, "result_msec": 1100000, "result_relay": "11:34:11", "result_relay_msec": 41651000, "rogaine_penalty": 0, "rogaine_score": 0, "scores": 0, "scores_ardf": 0, "speed": "07:20/km", "splits": [{"code": "38", "course_index": 1, "days": 0, "index": 0, "is_correct": true, "leg_place": 2, "leg_time": 31997, "length_leg": 0, "object": "Split", "relative_place": 2, "relative_time": 31997, "speed": "", "time": 40583000}, {"code": "31", "course_index": 2, "days": 0, "index": 1, "is_correct": true, "leg_place": 2, "leg_time": 111000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 142997, "speed": "", "time": 40694000}, {"code": "32", "course_index": 3, "days": 0, "index": 2, "is_correct": true, "leg_place": 3, "leg_time": 116000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 258997, "speed": "", "time": 40810000}, {"code": "34", "course_index": 4, "days": 0, "index": 3, "is_correct": true, "leg_place": 2, "leg_time": 52000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 310997, "speed": "", "time": 40862000}, {"code": "36", "course_index": 5, "days": 0, "index": 4, "is_correct": true, "leg_place": 1, "leg_time": 64000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 374997, "speed": "", "time": 40926000}, {"code": "37", "course_index": 6, "days": 0, "index": 5, "is_correct": true, "leg_place": 1, "leg_time": 99000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 473997, "speed": "", "time": 41025000}, {"code": "40", "course_index": 7, "days": 0, "index": 6, "is_correct": true, "leg_place": 1, "leg_time": 130000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 603997, "speed": "", "time": 41155000}, {"code": "46", "course_index": 8, "days": 0, "index": 7, "is_correct": true, "leg_place": 1, "leg_time": 81000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 684997, "speed": "", "time": 41236000}, {"code": "45", "course_index": 9, "days": 0, "index": 8, "is_correct": true, "leg_place": 3, "leg_time": 77000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 761997, "speed": "", "time": 41313000}, {"code": "44", "course_index": 10, "days": 0, "index": 9, "is_correct": true, "leg_place": 1, "leg_time": 19000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 780997, "speed": "", "time": 41332000}, {"code": "42", "course_index": 11, "days": 0, "index": 10, "is_correct": true, "leg_place": 4, "leg_time": 68000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 848997, "speed": "", "time": 41400000}, {"code": "41", "course_index": 12, "days": 0, "index": 11, "is_correct": true, "leg_place": 1, "leg_time": 62000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 910997, "speed": "", "time": 41462000}, {"code": "39", "course_index": 13, "days": 0, "index": 12, "is_correct": true, "leg_place": 1, "leg_time": 138000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 1048997, "speed": "", "time": 41600000}, {"code": "100", "course_index": 14, "days": 0, "index": 13, "is_correct": true, "leg_place": 2, "leg_time": 43000, "length_leg": 0, "object": "Split", "relative_place": 1, "relative_time": 1091997, "speed": "", "time": 41643000}], "start_msec": 40551003, "start_time": 40551003, "status": 1, "status_comment": "", "system_type": 2}], "settings": {"ignore_punches_before_start": false, "marked_route_dont_dsq": false, "marked_route_if_counting_lap": false, "marked_route_if_station_check": false, "marked_route_max_penalty_by_cp": false, "marked_route_mode": "off", "marked_route_penalty_lap_station_code": 80, "marked_route_penalty_time": 60000, "readout_duplicate_timeout": 15000, "result_processing_fixed_score_value": 1, "result_processing_mode": "time", "result_processing_score_mode": "rogain", "result_processing_scores_allow_duplicates": false, "result_processing_scores_max_overrun_time": 1800000, "result_processing_scores_minute_penalty": 1, "scores_array": "40,37,35,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1", "scores_formula": "200 - 100 * time / leader", "scores_mode": "off", "system_assign_chip_reading": "off", "system_assignment_mode": false, "system_duplicate_chip_processing": "several_results", "system_finish_cp_number": 90, "system_finish_source": "station", "system_missed_finish": "zero", "system_port": "COM7", "system_start_cp_number": 31, "system_start_source": "station", "system_zero_time": [11, 0, 0], "time_accuracy": 0, "time_format_24": "less24", "time_rounding": "down"}};
+    var selected = {"persons": []};
+    racePreparation(race);
+
+    var isRogaine = race.settings.result_processing_mode === 'scores';
+    var isArdf =  race.settings.result_processing_mode === 'ardf';
+
+    function getResultsByGroup(group, count) {
+        count = +count || 0;
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
+            var result = _a[_i];
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id && (count ? result.place <= count && result.place > 0 : 1)) {
+                var r = {
+                    index: 0,
+                    name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
+                    org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[result.person.qual],
+                    bib: result.person.bib,
+                    year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_laps: result.penalty_laps,
+                    scores_ardf: result.scores_ardf,
+                    rogaine_score: result.rogaine_score,
+                    rogaine_penalty: result.rogaine_penalty,
+                    rogaine_points_earned: result.rogaine_score + result.rogaine_penalty,
+                    result: result.result_current,
+                    result_relay: result.result_relay,
+                    result_msec: result.result_msec,
+                    diff: isRogaine || isArdf ? result.diff_scores : toHHMMSS(result.diff),
+                    place: result.place,
+                    status: result.status,
+                    scores: result.scores,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    is_out_of_competition: result.person.is_out_of_competition,
+                    speed: result.speed,
+                    data: result
+                };
+                if (result.status !== 1) {
+                    r.diff = '';
+                    r.place_show = '';
+                    r.speed = '';
+                    r.scores = '';
+                    r.rogaine_points_earned = '';
+                    r.rogaine_penalty = '';
+                    r.rogaine_score = '';
+                }
+
+                // SPLITS
+                var control_index = 0;
+                if (result.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
+                    var lastSplit = 0;
+                    for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+
+                            var tbl = document.createElement('table');
+                            tbl.className = 'table-split';
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')', split.leg_place));
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')', split.relative_place));
+                            r[control_index + '_' + split.code] = tbl;
+                            control_index++;
+                            lastSplit = split.relative_time;
+                        }
+                    }
+
+                    var finishMsec = r.result_msec - lastSplit;
+
+                    if (r.status === 1 && finishMsec > 0) {
+                        var tblF = document.createElement('table');
+                        tblF.className = 'table-split';
+                        tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
+                        var place_str = r.place > 0 ? r.place : 'o/c';
+                        tblF.appendChild(getTrBlock(toHHMMSS(r.result_msec) + ' (' + place_str + ')', r.place));
+                        r.finish_split = tblF;
+                    }
+                }
+
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
+                // ALL PUNCHES
+                var splitTable = document.createElement('table');
+                splitTable.className = 'table-split';
+                var splitTr = document.createElement('tr');
+                splitTable.appendChild(splitTr);
+                var prevTime = result.start_msec;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
+                    var tbl = document.createElement('table');
+                    tbl.className = 'table-split';
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    var splitTd = document.createElement('td');
+                    splitTd.appendChild(tbl);
+                    splitTr.appendChild(splitTd);
+                    prevTime = split.time;
+                }
+                r.all_splits = splitTable;
+
+                results.push(r);
+            }
+        }
+        results.sort(function (a, b) {
+            if (isRelay) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                }
+                return a.place - b.place
+
+            } else {
+                if (a.status !== 1 && b.status !== 1) {
+                    return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                }
+                if (a.status !== 1) {
+                    return 1
+                }
+                if (b.status !== 1) {
+                    return -1
+                }
+                if (a.is_out_of_competition || b.is_out_of_competition) {
+                    if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                        return -(a.rogaine_score - b.rogaine_score);
+                    }
+                    if (isArdf && a.scores_ardf != b.scores_ardf) {
+                        return -(a.scores_ardf - b.scores_ardf);
+                    }
+                    return a.result_msec - b.result_msec;
+                }
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                return a.place - b.place
+            }
+        });
+        var index = 0;
+        if (isRelay) {
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000;
+                }
+                results.push(r);
+            }
+        } else {
+            results.forEach(function (elem) {
+                index++;
+                elem.index = index;
+            })
+        }
+        return results;
+    }
+	function getResultsByCourse(group, count) {
+		count = +count || 0;
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        var splits_recalc_times = {};
+        var splits_recalc_times_total = {};
+        group.controls.forEach(function (control, index) {
+            splits_recalc_times[index + '_' + control.code] = [];
+            splits_recalc_times_total[index + '_' + control.code] = [];
+        });
+        for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
+            var result = _a[_i];
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.course && result.person.group.course.id === group.id) { //} && (count ? result.place <= count && result.place > 0 : 1)) {
+                var r = {
+                    index: 0,
+                    name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
+                    org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[result.person.qual],
+                    bib: result.person.bib,
+                    year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_laps: result.penalty_laps,
+                    scores_ardf: result.scores_ardf,
+                    rogaine_score: result.rogaine_score,
+                    rogaine_penalty: result.rogaine_penalty,
+                    rogaine_points_earned: result.rogaine_score + result.rogaine_penalty,
+                    result: result.result_current,
+                    result_msec: result.result_msec,
+                    diff: isRogaine || isArdf ? result.diff_scores : toHHMMSS(result.diff),
+                    place: result.place,
+                    status: result.status,
+                    scores: result.scores,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    is_out_of_competition: result.person.is_out_of_competition,
+                    speed: result.speed,
+					group: result.person.group.name,
+                    data: result
+                };
+                if (result.status !== 1) {
+                    r.diff = '';
+                    r.place_show = '';
+                    r.speed = '';
+                    r.scores = '';
+                    r.rogaine_points_earned = '';
+                    r.rogaine_penalty = '';
+                    r.rogaine_score = '';
+                }
+
+                // SPLITS
+                var control_index = 0;
+                if (result.splits) {
+                    for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+                            if ((control_index + '_' + split.code) in splits_recalc_times){
+                                splits_recalc_times[control_index + '_' + split.code].push(split.leg_time);
+                                splits_recalc_times_total[control_index + '_' + split.code].push(split.relative_time);
+                            }
+                            control_index++;
+                        }
+                    }
+                }
+
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
+                // ALL PUNCHES
+                var splitTable = document.createElement('table');
+                splitTable.className = 'table-split';
+                var splitTr = document.createElement('tr');
+                splitTable.appendChild(splitTr);
+                var prevTime = result.start_msec;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
+                    var tbl = document.createElement('table');
+                    tbl.className = 'table-split';
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    var splitTd = document.createElement('td');
+                    splitTd.appendChild(tbl);
+                    splitTr.appendChild(splitTd);
+                    prevTime = split.time;
+                }
+                r.all_splits = splitTable;
+
+                results.push(r);
+            }
+        }
+        results.sort(function (a, b) {
+            if (isRelay) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                }
+                return a.place - b.place
+            } else {
+                if (a.status !== 1 && b.status !== 1) {
+                    return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                }
+                if (a.status !== 1) {
+                    return 1
+                }
+                if (b.status !== 1) {
+                    return -1
+                }
+                if (a.is_out_of_competition || b.is_out_of_competition) {
+                    if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                        return -(a.rogaine_score - b.rogaine_score);
+                    }
+                    if (isArdf && a.scores_ardf != b.scores_ardf) {
+                        return -(a.scores_ardf - b.scores_ardf);
+                    }
+                    return a.result_msec - b.result_msec;
+                }
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                    return -(a.rogaine_score - b.rogaine_score);
+                }
+                if (isArdf && a.scores_ardf != b.scores_ardf) {
+                    return -(a.scores_ardf - b.scores_ardf);
+                }
+                return a.result_msec - b.result_msec;
+            }
+        });
+        var sort_splits_recalc_fnc = function(a,b){
+            return a-b;
+        }
+        group.controls.forEach(function (control, index) {
+            splits_recalc_times[index + '_' + control.code].sort(sort_splits_recalc_fnc);
+            splits_recalc_times_total[index + '_' + control.code].sort(sort_splits_recalc_fnc);
+        });
+        var index = 0;
+        if (isRelay) {
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000;
+                }
+                results.push(r);
+            }
+        } else {
+            var get_score = function(res){
+                if (isRogaine) return res.rogaine_score;
+                if (isArdf) return res.scores_ardf;
+                return 0
+            }
+            var newplace = 1;
+			var doubleplace = -1;
+			var best_result_msec = results[0] ? results[0].result_msec : 0;
+			var last_result_msec = results[0] ? results[0].result_msec : 0;
+            var best_score = results[0] ? get_score(results[0]) : 0;
+            var binary_search = function(arr,required){
+				if (!arr){
+					return 0;
+				}
+                var l = -1;
+                var r = arr.length-1;
+                while (r-l>1){
+                    var m = Math.floor((l+r)/2);
+                    if (arr[m]>=required){
+                        r = m;
+                    } else {
+                        l = m;
+                    }
+                }
+                if (arr[r]==required){
+                    return r+1;
+                }
+                return 0;
+            }
+            results.forEach(function (elem) {
+                index++;
+                elem.index = index;
+				if (!elem.data.person.is_out_of_competition && elem.place !== 0 && elem.place !== -1) {
+					if (isRogaine || isArdf || last_result_msec < elem.result_msec){
+						newplace += 1 + doubleplace;
+						doubleplace = 0;
+						last_result_msec = elem.result_msec;
+					} else {
+						doubleplace++;
+					}
+					elem.diff = isRogaine || isArdf ? best_score - get_score(elem) : toHHMMSS(elem.result_msec - best_result_msec);
+					elem.place = newplace;
+					elem.place_show = newplace;
+                }
+                var control_index = 0;
+                if (elem.data.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
+                    var lastSplit = 0;
+                    for (var _b = 0, _c = elem.data.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+                            var leg_place = binary_search(splits_recalc_times[control_index + '_' + split.code],split.leg_time);
+                            var relative_place = binary_search(splits_recalc_times_total[control_index + '_' + split.code],split.relative_time);
+                            if (leg_place>0 && relative_place>0){
+                                var tbl = document.createElement('table');
+                                tbl.className = 'table-split';
+                                tbl.appendChild(getTrBlock(toHHMMSS(split.leg_time) + ' (' + leg_place + ')', leg_place));
+                                tbl.appendChild(getTrBlock(toHHMMSS(split.relative_time) + ' (' + relative_place + ')', relative_place));
+                                elem[control_index + '_' + split.code] = tbl;
+                            }
+                            control_index++;
+                            lastSplit = split.relative_time;
+                        }
+                    }
+
+                    var finishMsec = elem.result_msec - lastSplit;
+
+                    if (elem.status === 1 && finishMsec > 0) {
+                        var tblF = document.createElement('table');
+                        tblF.className = 'table-split';
+                        tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
+                        tblF.appendChild(getTrBlock(toHHMMSS(elem.result_msec) + ' (' + elem.place_show + ')', elem.place));
+                        elem.finish_split = tblF;
+                    }
+                }
+            });
+        }
+        return results;
+    }
+
+    function getRankingByGroup(group) {
+        var rankingBlock = document.createElement('span');
+        var ranking = group.ranking;
+        if (ranking && ranking.is_active && ranking.rank_scores > 0) {
+            var text = 'Ranking, scores: ' + ranking.rank_scores.toFixed(0);
+            rankingBlock.appendChild(document.createTextNode(text));
+
+            for (var _i = 0; _i < ranking.rank.length; _i++) {
+                var rank = ranking.rank[_i];
+                if (rank.is_active) {
+                    if (rank.max_place > 0) {
+                        var text = Qualification[rank.qual] + ' - up to ' + rank.max_place + ' place';
+                        rankingBlock.appendChild(document.createElement("br"));
+                        rankingBlock.appendChild(document.createTextNode(text));
+                    }
+                    else {
+                        if (rank.max_time > 0) {
+                            var text = Qualification[rank.qual] + ' - ' + toHHMMSS(rank.max_time);
+                            if (rank.percent > 0) {
+                                text += ' (' + rank.percent + '%)';
+                            }
+                            rankingBlock.appendChild(document.createElement("br"));
+                            rankingBlock.appendChild(document.createTextNode(text));
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            var text = 'Rank was not calculated';
+            rankingBlock.appendChild(document.createTextNode(text));
+        }
+
+        return rankingBlock;
+    }
+
+    var Fields = {
+        fields: [
+            {key: 'index', title: '№', size: 4},
+            {key: 'group', title: 'Class', size: 10, active: false},
+            {key: 'name', title: 'Name', size: 30},
+            {key: 'org', title: 'Orgznization', size: 20},
+            {key: 'year', title: 'Year', size: 5},
+            {key: 'bib', title: 'Bib', size: 6},
+            {key: 'penalty_time', title: 'Penalty', size: 9, active: false},
+            {key: 'penalty_laps', title: 'Penalty,l', size: 9, active: false},
+            {key: 'scores_ardf', title: 'ARDF', size: 4, active: isArdf},
+            {key: 'rogaine_points_earned', title: 'Total', size: 5, active: isRogaine},
+            {key: 'rogaine_penalty', title: 'Pen.', size: 4, active: isRogaine},
+            {key: 'rogaine_score', title: 'Pts', size: 4, active: isRogaine},
+            {key: 'result', title: 'Result', size: 14},
+            {key: 'result_relay', title: 'Team result', size: 14},
+            {key: 'diff', title: 'Diff', size: 11, active: !isArdf && !isRogaine},
+            {key: 'speed', title: 'Pace', size: 12, active: false},
+            {key: 'place_show', title: 'Place', size: 6},
+            {key: 'scores', title: 'Scores', size: 5, active: false},
+            {key: 'all_splits', title: 'Splits', active: false}
+        ],
+        active: function (key, val) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    obj.active = val;
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    }
+                    else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        getField: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    return obj
+                }
+            }
+        },
+        getCopyFields: function () {
+            return JSON.parse(JSON.stringify(this.fields))
+        },
+        init: function () {
+            try {
+                var isRelay = race.data.race_type === 3
+                this.getField('all_splits').active = location.href.indexOf('all_splits=1') > -1;
+                this.getField('scores').active = location.href.indexOf('scores=1') > -1;
+                this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
+
+                this.getField('result_relay').active = isRelay
+            } catch (e){}
+            return this;
+        }
+    }.init();
+
+    store = {
+        showLinkForGroups: true
+    };
+
+    try {
+        store.splitsShow = location.href.indexOf('s_splits=1') > -1;
+        store.rankingShow = location.href.indexOf('ranking=1') > -1;
+        store.showProtocolByCourse = location.href.indexOf('by_course=1') > -1;
+    } catch (e) {}
+
+    function render() {
+        var resultBlock = document.getElementById('results-tables');
+        resultBlock.innerHTML = '';
+        Fields.active('group', store.showProtocolByCourse);
+        if (store.showProtocolByCourse){
+            var _a = race.courses;
+        } else {
+            var _a = race.groups;
+        }
+        for (var _i = 0; _i < _a.length; _i++) {
+            if (store.showProtocolByCourse){
+                var course = _a[_i];
+                var rows = getResultsByCourse(course, store.count);
+                var groupName = course.name;
+            } else {
+                var group = _a[_i];
+                var rows = getResultsByGroup(group, store.count);
+                var course = group.course;
+                var groupName = group.name;
+            }
+            if (!rows.length) {
+                continue;
+            }
+            var titleBlock = document.createElement('h2');
+            titleBlock.id = groupName;
+            var groupTitle = groupName;
+            if (course && course.controls && course.controls.length){
+                groupTitle += ', ' + course.controls.length + ' controls';
+            }
+            if (course && course.length){
+                groupTitle += ', ' + course.length / 1000 + ' km';
+            }
+            titleBlock.appendChild(document.createTextNode(groupTitle));
+            resultBlock.appendChild(titleBlock);
+            if (!store.showProtocolByCourse && store.showLinkForGroups) {
+                resultBlock.appendChild(getGroupsBlockElement(race));
+            }
+            var fields = Fields.getCopyFields();
+            if (store.splitsShow && course) {
+                course.controls.forEach(function (control, index) {
+                    fields.push({key: index + '_' + control.code, title: control.code})
+                });
+                fields.push({key: 'finish_split', title: 'F'})
+            }
+            if (!store.tableView && !store.splitsShow && !Fields.isActive('all_splits')) {
+                resultBlock.appendChild(new TableTextGenerator(rows, fields).getTable());
+            } else {
+                resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            }
+            //show ranking information
+            if (!store.showProtocolByCourse && store.rankingShow) {
+                resultBlock.appendChild(getRankingByGroup(group))
+            }
+            if (store.newPage && _i < _a.length - 1) {
+                var newPage = document.createElement('div');
+                newPage.className = 'new-page';
+                resultBlock.appendChild(newPage);
+            }
+        }
+        var query = {
+            s_splits: store.splitsShow ? 1 : 0,
+            ranking: store.rankingShow ? 1 : 0,
+            by_course: store.showProtocolByCourse ? 1 : 0,
+            all_splits: Fields.isActive('all_splits') ? 1 : 0,
+            scores: Fields.isActive('scores') ? 1 : 0,
+            penalty_time: Fields.isActive('penalty_time') ? 1 : 0
+        };
+        var queryString = '?';
+        Object.keys(query).forEach(function (key) {
+            if (query[key]) {
+                queryString += key + '=' + query[key] + '&';
+            }
+        });
+        queryString += 'sportorg=1';
+        try {
+            var href = location.href.split('?')[0];
+            history.pushState({}, null, href + queryString);
+        } catch (e) {}
+    }
+
+    render();
+
+    var Scrolling = {
+        direction: 1,
+        enabled: false,
+        lock: false,
+        prev: 0,
+        intervalTimer: 0,
+        init: function () {
+            var _this = this;
+            if (_this.intervalTimer) {
+                clearInterval(_this.intervalTimer)
+            }
+            _this.intervalTimer = setInterval(function () {
+                _this.lock = !_this.lock;
+            }, 5000);
+            window.onscroll = function () {
+                var d = document.documentElement;
+                var offset = d.scrollTop + window.innerHeight;
+                var height = d.offsetHeight;
+
+                if (offset === height) {
+                    _this.direction = -1;
+                }
+                if (offset <= window.innerHeight) {
+                    _this.direction = 1;
+                }
+            };
+            this.pageScroll();
+            return this;
+        },
+        pageScroll: function () {
+            var _this = this;
+            if (_this.enabled && ! _this.lock) {
+                window.scrollBy(10, _this.direction);
+            }
+            setTimeout(function () {
+                _this.pageScroll();
+            }, 10);
+        }
+    }.init();
+
+    new SettingsGenerator([
+        {
+            title: 'Classes links',
+            value: !!store.showLinkForGroups,
+            change: function (checked) {
+                store.showLinkForGroups = checked;
+                render()
+            }
+        },
+        {
+            title: 'Results by courses',
+            value: !!store.showProtocolByCourse,
+            change: function (checked) {
+                store.showProtocolByCourse = checked;
+                render()
+            }
+        },
+        {
+            title: 'Table view',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
+        {
+            title: 'Bib',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Penalty time',
+            value: Fields.isActive('penalty_time'),
+            change: function (checked) {
+                Fields.active('penalty_time', checked);
+                render()
+            }
+        },
+        {
+            title: 'Penalty laps',
+            value: Fields.isActive('penalty_laps'),
+            change: function (checked) {
+                Fields.active('penalty_laps', checked);
+                render()
+            }
+        },
+        {
+            title: 'Diff',
+            value: Fields.isActive('diff'),
+            change: function (checked) {
+                Fields.active('diff', checked);
+                render()
+            }
+        },
+        {
+            title: 'Pace',
+            value: Fields.isActive('speed'),
+            change: function (checked) {
+                Fields.active('speed', checked);
+                render()
+            }
+        },
+        {
+            title: 'Splits (no forking)',
+            value: !!store.splitsShow,
+            change: function (checked) {
+                store.splitsShow = checked;
+                render()
+            }
+        },
+        {
+            title: 'Splits (all)',
+            value: Fields.isActive('all_splits'),
+            change: function (checked) {
+                Fields.active('all_splits', checked);
+                render()
+            }
+        },
+        {
+            title: 'Scores',
+            value: Fields.isActive('scores'),
+            change: function (checked) {
+                Fields.active('scores', checked);
+                render()
+            }
+        },
+        {
+            title: 'Ranking (Russian)',
+            value: store.rankingShow,
+            change: function (checked) {
+                store.rankingShow = checked;
+                render()
+            }
+        },
+        {
+            title: 'Show first: ',
+            value: [
+                {text: 'All', value: 0},
+                {text: '1', value: 1},
+                {text: '3', value: 3},
+                {text: '4', value: 4},
+                {text: '5', value: 5},
+                {text: '6', value: 6},
+                {text: '10', value: 10}
+            ],
+            change: function (arr) {
+                store.count = arr[0];
+                render();
+            }
+        },
+        {
+            title: 'Each class from new page',
+            value: false,
+            change: function (checked) {
+                store.newPage = checked;
+                render()
+            }
+        },
+        {
+            title: 'Autoscroll',
+            value: Scrolling.enabled,
+            change: function (checked) {
+                Scrolling.enabled = checked;
+            }
+        },
+    ]).show();
+</script>
+
+</div>
+<div id="footer">
+    
+    <a href="https://sportorg.readthedocs.io">ПО SportOrg v1.7.1</a>
+    <script type="text/javascript">
+        var l = new Date();
+        document.write ('<span class="print-only">Время печати: ' + l.toLocaleString() + '</span>');
+    </script>
+    
+</div>
+</body>
+</html>
